@@ -7,135 +7,74 @@
 <title>Private Cash Log</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1220;--panel:#131e30;--panel2:#18263b;--text:#eef4ff;--muted:#9aabc3;--line:#2a3a52;--gold:#f5c451;--green:#4ade80;--red:#fb7185}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#17243a 0,#0b1220 48%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:24px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.mark{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#ffe6a0,#c58b19);color:#171717;font-size:23px;font-weight:900}.brand h1{font-size:22px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.card{background:rgba(19,30,48,.96);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 14px 36px #0002}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:13px}.btn{border:0;border-radius:11px;padding:12px 15px;font:inherit;font-weight:750;cursor:pointer;background:var(--gold);color:#191919}.btn.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.btn.danger{background:#4a202b;color:#ffdce2;border:1px solid #71303f}.btn:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{padding:16px;border:1px solid var(--line);background:var(--panel2);border-radius:14px;min-width:0}.stat .label{font-size:13px;color:var(--muted)}.stat .value{font-size:clamp(19px,4vw,26px);font-weight:850;margin-top:7px;overflow-wrap:anywhere}.stat.total .value{color:var(--gold)}label{display:block;font-weight:700;font-size:14px;margin-bottom:7px}input,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#0c1524;color:var(--text);font:inherit;outline:none}input:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:72px;resize:vertical}.field{margin-bottom:15px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}h2{font-size:18px;margin:0 0 14px}.status{padding:12px 14px;border-radius:12px;background:#17283c;color:#c8d8ef;margin:12px 0;font-size:14px;overflow-wrap:anywhere}.status.error{background:#40212b;color:#ffd5dd}.status.good{background:#123526;color:#c9f9da}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:570px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px}th{color:var(--muted);font-weight:650}td.amount{font-weight:750;white-space:nowrap}.actions{display:flex;gap:8px}.actions button{padding:8px 10px;font-size:13px}.empty{text-align:center;padding:24px;color:var(--muted)}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}.pill{display:inline-block;padding:5px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:12px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#17243a 0,#0b1220 48%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}.wrap{max-width:1000px;margin:auto;padding:24px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.mark{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#ffe6a0,#c58b19);color:#171717;font-size:23px;font-weight:900}.brand h1{font-size:22px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.card{background:rgba(19,30,48,.96);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 14px 36px #0002}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:13px}.btn{border:0;border-radius:11px;padding:12px 15px;font:inherit;font-weight:750;cursor:pointer;background:var(--gold);color:#191919}.btn.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.btn.danger{background:#4a202b;color:#ffdce2;border:1px solid #71303f}.btn:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{padding:16px;border:1px solid var(--line);background:var(--panel2);border-radius:14px;min-width:0}.stat .label{font-size:13px;color:var(--muted)}.stat .value{font-size:clamp(19px,4vw,26px);font-weight:850;margin-top:7px;overflow-wrap:anywhere}.stat.total .value{color:var(--gold)}label{display:block;font-weight:700;font-size:14px;margin-bottom:7px}input,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#0c1524;color:var(--text);font:inherit;outline:none}input:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:72px;resize:vertical}.field{margin-bottom:15px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}h2{font-size:18px;margin:0 0 14px}.status{padding:12px 14px;border-radius:12px;background:#17283c;color:#c8d8ef;margin:12px 0;font-size:14px;overflow-wrap:anywhere}.status.error{background:#40212b;color:#ffd5dd}.status.good{background:#123526;color:#c9f9da}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px}th{color:var(--muted);font-weight:650}td.amount{font-weight:750;white-space:nowrap}.actions{display:flex;gap:8px}.actions button{padding:8px 10px;font-size:13px}.empty{text-align:center;padding:24px;color:var(--muted)}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}.pill{display:inline-block;padding:5px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:12px}.positive{color:var(--green)}.negative{color:var(--red)}
 @media(max-width:600px){.wrap{padding:17px 12px 35px}.card{padding:16px}.grid{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.brand h1{font-size:20px}.top .btn{width:100%}.top #userArea{width:100%}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
-    <div class="brand"><div class="mark">₦</div><div><h1>Private Cash Log</h1><p>Your charging business records, saved securely online</p></div></div>
-    <div id="userArea" class="row hidden" style="flex:0 1 auto"><span id="userEmail" class="small muted"></span><button id="signOutBtn" class="btn secondary">Sign out</button></div>
-  </header>
-
-  <section id="loginCard" class="card">
-    <h2>Sign in to your private log</h2>
-    <p class="muted">Use the Google account you want to use for this business record. Your records are stored under your account, not shared with other app users.</p>
-    <button id="signInBtn" class="btn">Continue with Google</button>
-    <div id="loginStatus" class="status">Connecting to Firebase…</div>
-  </section>
-
-  <main id="app" class="hidden">
-    <div id="mainStatus" class="status">Loading your records…</div>
-    <section class="grid">
-      <div class="stat"><div class="label">Today's cash</div><div id="todayCashStat" class="value">₦0</div></div>
-      <div class="stat"><div class="label">Today's transfers</div><div id="todayTransferStat" class="value">₦0</div></div>
-      <div class="stat total"><div class="label">Today's total income</div><div id="todayTotalStat" class="value">₦0</div></div>
-    </section>
-
-    <section class="card">
-      <h2 id="formTitle">Record daily income</h2>
-      <p class="muted small">Enter the day's totals from customer payments. Do not count transfers between your own accounts as income.</p>
-      <form id="dayForm">
-        <div class="field"><label for="dateInput">Date</label><input id="dateInput" type="date" required></div>
-        <div class="formgrid">
-          <div class="field"><label for="cashInput">Cash received (₦)</label><input id="cashInput" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 2500" required></div>
-          <div class="field"><label for="transferInput">Transfers received (₦)</label><input id="transferInput" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 500" required></div>
-        </div>
-        <div class="stat total" style="margin:0 0 15px"><div class="label">Total income for this date</div><div id="previewTotal" class="value">₦0</div></div>
-        <div class="field"><label for="noteInput">Note (optional)</label><textarea id="noteInput" maxlength="300" placeholder="Anything you want to remember about this day"></textarea></div>
-        <div class="row"><button id="saveBtn" class="btn" type="submit">Save daily record</button><button id="cancelEditBtn" class="btn secondary hidden" type="button">Cancel edit</button></div>
-      </form>
-    </section>
-
-    <section class="card">
-      <div class="row" style="justify-content:space-between"><h2 style="margin:0">Monthly summary</h2><div style="max-width:210px"><label for="monthInput" class="small">Choose month</label><input id="monthInput" type="month"></div></div>
-      <div class="grid" style="margin-top:15px">
-        <div class="stat"><div class="label">Cash this month</div><div id="monthCashStat" class="value">₦0</div></div>
-        <div class="stat"><div class="label">Transfers this month</div><div id="monthTransferStat" class="value">₦0</div></div>
-        <div class="stat total"><div class="label">Total this month</div><div id="monthTotalStat" class="value">₦0</div></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Daily records</h2><span id="recordCount" class="pill">0 records</span></div>
-      <div class="tablewrap"><table><thead><tr><th>Date</th><th>Cash</th><th>Transfer</th><th>Total</th><th>Actions</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
-      <div id="emptyRecords" class="empty">No records yet. Save your first day's income above.</div>
-    </section>
-  </main>
-  <div class="foot">Private Cash Log · Keep your Google account secure. Cloud access depends on your Firebase security rules.</div>
+<header class="top"><div class="brand"><div class="mark">₦</div><div><h1>Private Cash Log</h1><p>Your charging business records, saved securely online</p></div></div><div id="userArea" class="row hidden" style="flex:0 1 auto"><span id="userEmail" class="small muted"></span><button id="signOutBtn" class="btn secondary">Sign out</button></div></header>
+<section id="loginCard" class="card"><h2>Sign in to your private log</h2><p class="muted">Use the Google account you want to use for this business record. Records are stored under your account.</p><button id="signInBtn" class="btn">Continue with Google</button><div id="loginStatus" class="status">Connecting to Firebase…</div></section>
+<main id="app" class="hidden">
+<div id="mainStatus" class="status">Loading your records…</div>
+<section class="grid"><div class="stat"><div class="label">Today's cash income</div><div id="todayCashStat" class="value">₦0</div></div><div class="stat"><div class="label">Today's transfers</div><div id="todayTransferStat" class="value">₦0</div></div><div class="stat total"><div class="label">Today's total income</div><div id="todayTotalStat" class="value">₦0</div></div></section>
+<section class="card"><h2 id="incomeFormTitle">Add income transaction</h2><p class="muted small">Each save is a separate transaction. Do not count transfers between your own accounts as income. Only today's entries can be edited or deleted.</p>
+<form id="incomeForm"><div class="formgrid"><div class="field"><label for="incomeDate">Date</label><input id="incomeDate" type="date" required></div><div class="field"><label for="incomeNote">Note (optional)</label><input id="incomeNote" maxlength="200" placeholder="e.g. evening customers"></div></div><div class="formgrid"><div class="field"><label for="cashInput">Cash received (₦)</label><input id="cashInput" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 2500" required></div><div class="field"><label for="transferInput">Transfers received (₦)</label><input id="transferInput" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 500" required></div></div><div class="stat total" style="margin:0 0 15px"><div class="label">Transaction total</div><div id="incomePreview" class="value">₦0</div></div><div class="row"><button id="saveIncomeBtn" class="btn" type="submit">Save income</button><button id="cancelIncomeEditBtn" class="btn secondary hidden" type="button">Cancel edit</button></div></form></section>
+<section class="card"><h2 id="expenseFormTitle">Record money removed</h2><p class="muted small">Record money taken out of the business. This is kept separate from income. Only today's entries can be edited or deleted.</p><form id="expenseForm"><div class="formgrid"><div class="field"><label for="expenseDate">Date</label><input id="expenseDate" type="date" required></div><div class="field"><label for="expenseAmount">Amount removed (₦)</label><input id="expenseAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 1000" required></div></div><div class="field"><label for="expenseNote">Reason (optional)</label><input id="expenseNote" maxlength="200" placeholder="e.g. personal withdrawal or business expense"></div><div class="row"><button id="saveExpenseBtn" class="btn" type="submit">Save money removed</button><button id="cancelExpenseEditBtn" class="btn secondary hidden" type="button">Cancel edit</button></div></form></section>
+<section class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Monthly calculation</h2><div style="max-width:210px"><label for="monthInput" class="small">Choose month</label><input id="monthInput" type="month"></div></div><p class="muted small">Click Calculate to total income and money removed from the first day of the selected month through today (or the full month if it has ended).</p><button id="calculateMonthBtn" class="btn" type="button" style="margin-top:4px">Calculate month</button><div class="grid" style="margin-top:15px"><div class="stat"><div class="label">Total income</div><div id="monthIncomeStat" class="value">—</div></div><div class="stat"><div class="label">Total money removed</div><div id="monthRemovedStat" class="value">—</div></div><div class="stat total"><div class="label">Net change</div><div id="monthNetStat" class="value">—</div></div></div><div id="monthStatus" class="muted small" style="margin-top:10px">Choose a month and click Calculate month.</div></section>
+<section class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Transaction history</h2><span id="recordCount" class="pill">0 entries</span></div><div class="row" style="margin:12px 0"><div><label for="historyMonth" class="small">Filter by month (optional)</label><input id="historyMonth" type="month"></div><div style="align-self:end"><button id="clearHistoryFilter" class="btn secondary" type="button">Show all dates</button></div></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Type</th><th>Cash</th><th>Transfer</th><th>Amount</th><th>Note / reason</th><th>Actions</th></tr></thead><tbody id="recordsBody"></tbody></table></div><div id="emptyRecords" class="empty">No entries yet. Save your first transaction above.</div></section>
+</main><div class="foot">Private Cash Log · Keep your Google account secure. Cloud access depends on your Firebase security rules.</div>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA0PfsjFQCxx17sPQdsAK69quONGpJHUvE",
-  authDomain: "noble-private-cash-log.firebaseapp.com",
-  databaseURL: "https://noble-private-cash-log-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "noble-private-cash-log",
-  storageBucket: "noble-private-cash-log.firebasestorage.app",
-  messagingSenderId: "532091769228",
-  appId: "1:532091769228:web:812a82176516069d3386a9"
-};
-
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
-const provider = new GoogleAuthProvider();
-let currentUser = null;
-let records = [];
-let editingDate = null;
-const $ = id => document.getElementById(id);
-const today = new Date();
-const localDateString = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-const money = n => new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(Number(n)||0);
-const safeNum = el => Math.max(0, Number(el.value)||0);
-function setStatus(message, type='') { const el=$('mainStatus'); el.textContent=message; el.className='status '+type; }
-function setLoginStatus(message, type='') { const el=$('loginStatus'); el.textContent=message; el.className='status '+type; }
-function showLoggedIn(user) {
-  $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden');
-  $('userEmail').textContent=user.email || 'Signed in with Google';
-}
-function showLoggedOut() { $('loginCard').classList.remove('hidden'); $('app').classList.add('hidden'); $('userArea').classList.add('hidden'); }
-function updatePreview() { $('previewTotal').textContent=money(safeNum($('cashInput'))+safeNum($('transferInput'))); }
-function updateSummaries() {
-  const todayKey=localDateString(new Date()); const todayRec=records.find(r=>r.date===todayKey);
-  $('todayCashStat').textContent=money(todayRec?.cash||0); $('todayTransferStat').textContent=money(todayRec?.transfer||0); $('todayTotalStat').textContent=money((todayRec?.cash||0)+(todayRec?.transfer||0));
-  const month=$('monthInput').value || todayKey.slice(0,7); const monthRows=records.filter(r=>r.date.startsWith(month));
-  const cash=monthRows.reduce((s,r)=>s+r.cash,0), transfer=monthRows.reduce((s,r)=>s+r.transfer,0);
-  $('monthCashStat').textContent=money(cash); $('monthTransferStat').textContent=money(transfer); $('monthTotalStat').textContent=money(cash+transfer);
-  $('recordCount').textContent=`${records.length} ${records.length===1?'record':'records'}`;
-}
-function renderRecords() {
-  const body=$('recordsBody'); body.replaceChildren();
-  const month=$('monthInput').value; const shown=[...records].filter(r=>!month||r.date.startsWith(month)).sort((a,b)=>b.date.localeCompare(a.date));
-  $('emptyRecords').classList.toggle('hidden',shown.length>0); $('recordsBody').closest('table').classList.toggle('hidden',shown.length===0);
-  for(const r of shown){
-    const tr=document.createElement('tr');
-    for(const val of [r.date,money(r.cash),money(r.transfer),money(r.cash+r.transfer)]){const td=document.createElement('td');td.textContent=val;if(val.startsWith('₦'))td.className='amount';tr.appendChild(td)}
-    const actionTd=document.createElement('td'); const actions=document.createElement('div');actions.className='actions';
-    const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='Edit';edit.type='button';edit.addEventListener('click',()=>beginEdit(r));
-    const del=document.createElement('button');del.className='btn danger';del.textContent='Delete';del.type='button';del.addEventListener('click',()=>removeRecord(r));
-    actions.append(edit,del);actionTd.append(actions);tr.append(actionTd);body.append(tr);
-  }
-  updateSummaries();
-}
-function resetForm(){editingDate=null;$('dayForm').reset();$('dateInput').value=localDateString(new Date());$('formTitle').textContent='Record daily income';$('saveBtn').textContent='Save daily record';$('cancelEditBtn').classList.add('hidden');updatePreview();}
-function beginEdit(r){editingDate=r.date;$('dateInput').value=r.date;$('cashInput').value=r.cash;$('transferInput').value=r.transfer;$('noteInput').value=r.note||'';$('formTitle').textContent=`Edit record for ${r.date}`;$('saveBtn').textContent='Update daily record';$('cancelEditBtn').classList.remove('hidden');updatePreview();window.scrollTo({top:0,behavior:'smooth'});}
-function entriesRef(){return collection(db,'users',currentUser.uid,'days');}
-async function loadRecords(){setStatus('Loading your cloud records…');try{const snap=await getDocs(entriesRef());records=snap.docs.map(d=>({id:d.id,...d.data()}));renderRecords();setStatus('Your records are synced with Firebase.','good');}catch(e){console.error(e);setStatus('Could not load records. Check that the Firestore security rules are set up, then retry. Details: '+e.message,'error');}}
-async function removeRecord(r){if(!confirm(`Delete the record for ${r.date}? This cannot be undone.`))return;try{await deleteDoc(doc(db,'users',currentUser.uid,'days',r.date));records=records.filter(x=>x.date!==r.date);if(editingDate===r.date)resetForm();renderRecords();setStatus(`Deleted the record for ${r.date}.`,'good');}catch(e){setStatus('Delete failed: '+e.message,'error');}}
-$('signInBtn').addEventListener('click',async()=>{ $('signInBtn').disabled=true;setLoginStatus('Opening Google sign-in…');try{await signInWithPopup(auth,provider);}catch(e){console.error(e);if(e.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,provider);return;}catch(er){e=er;}}setLoginStatus('Sign-in failed: '+e.message,'error');}finally{$('signInBtn').disabled=false;}});
+const firebaseConfig={apiKey:"AIzaSyA0PfsjFQCxx17sPQdsAK69quONGpJHUvE",authDomain:"noble-private-cash-log.firebaseapp.com",databaseURL:"https://noble-private-cash-log-default-rtdb.europe-west1.firebasedatabase.app",projectId:"noble-private-cash-log",storageBucket:"noble-private-cash-log.firebasestorage.app",messagingSenderId:"532091769228",appId:"1:532091769228:web:812a82176516069d3386a9"};
+const appFirebase=initializeApp(firebaseConfig),auth=getAuth(appFirebase),db=getFirestore(appFirebase),provider=new GoogleAuthProvider();
+let currentUser=null, incomes=[], expenses=[], legacyDays=[], editingIncomeId=null, editingExpenseId=null, monthlyCalculated=false;
+const $=id=>document.getElementById(id);
+const localDateString=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const todayKey=()=>localDateString(new Date());
+const money=n=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(Number(n)||0);
+const safeNum=el=>Math.max(0,Number(el.value)||0);
+function setStatus(m,t=''){const e=$('mainStatus');e.textContent=m;e.className='status '+t}
+function setLoginStatus(m,t=''){const e=$('loginStatus');e.textContent=m;e.className='status '+t}
+function showLoggedIn(u){$('loginCard').classList.add('hidden');$('app').classList.remove('hidden');$('userArea').classList.remove('hidden');$('userEmail').textContent=u.email||'Signed in with Google'}
+function showLoggedOut(){$('loginCard').classList.remove('hidden');$('app').classList.add('hidden');$('userArea').classList.add('hidden')}
+function incomeTotal(r){return (Number(r.cash)||0)+(Number(r.transfer)||0)}
+function allIncomeRows(){return [...legacyDays.map(r=>({...r,kind:'legacy',id:r.id||r.date,amount:incomeTotal(r)})),...incomes.map(r=>({...r,kind:'income',amount:incomeTotal(r)}))]}
+function todayIncome(){return allIncomeRows().filter(r=>r.date===todayKey())}
+function todayExpense(){return expenses.filter(r=>r.date===todayKey())}
+function updateToday(){const rows=todayIncome();$('todayCashStat').textContent=money(rows.reduce((s,r)=>s+(Number(r.cash)||0),0));$('todayTransferStat').textContent=money(rows.reduce((s,r)=>s+(Number(r.transfer)||0),0));$('todayTotalStat').textContent=money(rows.reduce((s,r)=>s+r.amount,0))}
+function updateIncomePreview(){$('incomePreview').textContent=money(safeNum($('cashInput'))+safeNum($('transferInput')))}
+function isToday(date){return date===todayKey()}
+function resetIncomeForm(){editingIncomeId=null;$('incomeForm').reset();$('incomeDate').value=todayKey();$('incomeFormTitle').textContent='Add income transaction';$('saveIncomeBtn').textContent='Save income';$('cancelIncomeEditBtn').classList.add('hidden');$('incomeDate').disabled=false;updateIncomePreview()}
+function resetExpenseForm(){editingExpenseId=null;$('expenseForm').reset();$('expenseDate').value=todayKey();$('expenseFormTitle').textContent='Record money removed';$('saveExpenseBtn').textContent='Save money removed';$('cancelExpenseEditBtn').classList.add('hidden');$('expenseDate').disabled=false}
+function collectionRef(name){return collection(db,'users',currentUser.uid,name)}
+async function loadRecords(){setStatus('Loading your cloud records…');try{const [txSnap,exSnap,daysSnap]=await Promise.all([getDocs(collectionRef('transactions')),getDocs(collectionRef('expenses')),getDocs(collectionRef('days'))]);incomes=txSnap.docs.map(d=>({id:d.id,...d.data()}));expenses=exSnap.docs.map(d=>({id:d.id,...d.data()}));legacyDays=daysSnap.docs.map(d=>({id:d.id,...d.data(),legacy:true}));updateToday();renderRecords();setStatus('Your records are synced with Firebase.','good')}catch(e){console.error(e);setStatus('Could not load records. Check Firestore security rules. Details: '+e.message,'error')}}
+function addAction(actions,label,cls,fn){const b=document.createElement('button');b.type='button';b.className='btn '+cls;b.textContent=label;b.addEventListener('click',fn);actions.appendChild(b)}
+function renderRecords(){const body=$('recordsBody');body.replaceChildren();const month=$('historyMonth').value;const rows=[...allIncomeRows().map(r=>({...r,recordType:'income'})),...expenses.map(r=>({...r,recordType:'expense',amount:Number(r.amount)||0}))].filter(r=>!month||r.date.startsWith(month)).sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||'').localeCompare(a.createdAt||''));$('emptyRecords').classList.toggle('hidden',rows.length>0);$('recordsBody').closest('table').classList.toggle('hidden',rows.length===0);$('recordCount').textContent=`${rows.length} ${rows.length===1?'entry':'entries'}`;
+for(const r of rows){const tr=document.createElement('tr');const values=[r.date,r.recordType==='income'?'Income':'Money removed',r.recordType==='income'?money(r.cash):'—',r.recordType==='income'?money(r.transfer):'—',money(r.amount),r.note||''];for(const v of values){const td=document.createElement('td');td.textContent=v;if(typeof v==='string'&&v.startsWith('₦'))td.className='amount';tr.appendChild(td)}const td=document.createElement('td'),actions=document.createElement('div');actions.className='actions';if(isToday(r.date)){if(r.recordType==='income'&&r.kind==='legacy'){addAction(actions,'Edit','secondary',()=>editLegacy(r));addAction(actions,'Delete','danger',()=>deleteLegacy(r))}else if(r.recordType==='income'){addAction(actions,'Edit','secondary',()=>editIncome(r));addAction(actions,'Delete','danger',()=>deleteIncome(r))}else{addAction(actions,'Edit','secondary',()=>editExpense(r));addAction(actions,'Delete','danger',()=>deleteExpense(r))}}else{const locked=document.createElement('span');locked.className='pill';locked.textContent='Locked';actions.appendChild(locked)}td.appendChild(actions);tr.appendChild(td);body.appendChild(tr)}
+updateToday()}
+function editIncome(r){if(!isToday(r.date))return alert('Only today’s entries can be edited.');editingIncomeId=r.id;$('incomeDate').value=r.date;$('incomeDate').disabled=true;$('cashInput').value=r.cash;$('transferInput').value=r.transfer;$('incomeNote').value=r.note||'';$('incomeFormTitle').textContent='Edit today’s income';$('saveIncomeBtn').textContent='Update income';$('cancelIncomeEditBtn').classList.remove('hidden');updateIncomePreview();window.scrollTo({top:0,behavior:'smooth'})}
+function editLegacy(r){if(!isToday(r.date))return alert('Previous-day records are locked.');editingIncomeId='legacy:'+r.date;$('incomeDate').value=r.date;$('incomeDate').disabled=true;$('cashInput').value=r.cash;$('transferInput').value=r.transfer;$('incomeNote').value=r.note||'';$('incomeFormTitle').textContent='Edit today’s original daily record';$('saveIncomeBtn').textContent='Update record';$('cancelIncomeEditBtn').classList.remove('hidden');updateIncomePreview();window.scrollTo({top:0,behavior:'smooth'})}
+function editExpense(r){if(!isToday(r.date))return alert('Only today’s entries can be edited.');editingExpenseId=r.id;$('expenseDate').value=r.date;$('expenseDate').disabled=true;$('expenseAmount').value=r.amount;$('expenseNote').value=r.note||'';$('expenseFormTitle').textContent='Edit today’s money removed';$('saveExpenseBtn').textContent='Update removal';$('cancelExpenseEditBtn').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'})}
+async function deleteIncome(r){if(!isToday(r.date))return alert('Previous-day records are locked.');if(!confirm('Delete this income entry?'))return;try{await deleteDoc(doc(db,'users',currentUser.uid,'transactions',r.id));incomes=incomes.filter(x=>x.id!==r.id);renderRecords();setStatus('Income entry deleted.','good')}catch(e){setStatus('Delete failed: '+e.message,'error')}}
+async function deleteLegacy(r){if(!isToday(r.date))return alert('Previous-day records are locked.');if(!confirm('Delete today’s original daily record?'))return;try{await deleteDoc(doc(db,'users',currentUser.uid,'days',r.date));legacyDays=legacyDays.filter(x=>x.date!==r.date);renderRecords();setStatus('Today’s original record deleted.','good')}catch(e){setStatus('Delete failed: '+e.message,'error')}}
+async function deleteExpense(r){if(!isToday(r.date))return alert('Previous-day records are locked.');if(!confirm('Delete this money-removal entry?'))return;try{await deleteDoc(doc(db,'users',currentUser.uid,'expenses',r.id));expenses=expenses.filter(x=>x.id!==r.id);renderRecords();setStatus('Money-removal entry deleted.','good')}catch(e){setStatus('Delete failed: '+e.message,'error')}}
+function randomId(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`}
+$('signInBtn').addEventListener('click',async()=>{ $('signInBtn').disabled=true;setLoginStatus('Opening Google sign-in…');try{await signInWithPopup(auth,provider)}catch(e){console.error(e);if(e.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,provider);return}catch(er){e=er}}setLoginStatus('Sign-in failed: '+e.message,'error')}finally{$('signInBtn').disabled=false}});
 $('signOutBtn').addEventListener('click',()=>signOut(auth));
-$('cashInput').addEventListener('input',updatePreview);$('transferInput').addEventListener('input',updatePreview);$('monthInput').addEventListener('change',renderRecords);$('cancelEditBtn').addEventListener('click',resetForm);
-$('dayForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!currentUser)return;const date=$('dateInput').value;const cash=safeNum($('cashInput'));const transfer=safeNum($('transferInput'));const note=$('noteInput').value.trim();if(!date){setStatus('Choose a date first.','error');return;}const previous=records.find(r=>r.date===date);if(previous&&editingDate!==date&&!confirm(`A record already exists for ${date}. Replace its cash, transfer and note values with these values?`))return;
-  $('saveBtn').disabled=true;setStatus('Saving your record to the cloud…');try{const data={date,cash,transfer,note,updatedAt:new Date().toISOString()};await setDoc(doc(db,'users',currentUser.uid,'days',date),data);records=records.filter(r=>r.date!==date);records.push({id:date,...data});renderRecords();resetForm();$('monthInput').value=date.slice(0,7);renderRecords();setStatus(`Saved ${date}: ${money(cash+transfer)} total income.`,'good');}catch(e){console.error(e);setStatus('Save failed: '+e.message,'error');}finally{$('saveBtn').disabled=false;}});
-$('dateInput').value=localDateString(new Date());$('monthInput').value=localDateString(new Date()).slice(0,7);updatePreview();
+$('cashInput').addEventListener('input',updateIncomePreview);$('transferInput').addEventListener('input',updateIncomePreview);$('cancelIncomeEditBtn').addEventListener('click',resetIncomeForm);$('cancelExpenseEditBtn').addEventListener('click',resetExpenseForm);
+$('incomeForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!currentUser)return;const date=$('incomeDate').value;if(date!==todayKey()){setStatus('You can only add income for today. Previous days are locked.','error');return}const cash=safeNum($('cashInput')),transfer=safeNum($('transferInput')),note=$('incomeNote').value.trim();if(cash+transfer<=0){setStatus('Enter an amount greater than zero.','error');return}const btn=$('saveIncomeBtn');btn.disabled=true;setStatus('Saving income to the cloud…');try{const data={date,cash,transfer,note,updatedAt:new Date().toISOString()};if(editingIncomeId?.startsWith('legacy:')){const oldDate=editingIncomeId.slice(7);await setDoc(doc(db,'users',currentUser.uid,'days',oldDate),{date:oldDate,cash,transfer,note,updatedAt:new Date().toISOString()});legacyDays=legacyDays.map(r=>r.date===oldDate?{...r,...data,id:oldDate}:r)}else{const id=editingIncomeId||randomId();data.createdAt=editingIncomeId?(incomes.find(r=>r.id===editingIncomeId)?.createdAt||new Date().toISOString()):new Date().toISOString();await setDoc(doc(db,'users',currentUser.uid,'transactions',id),data);if(editingIncomeId)incomes=incomes.map(r=>r.id===id?{id,...data}:r);else incomes.push({id,...data})}resetIncomeForm();renderRecords();setStatus('Income saved.','good')}catch(e){console.error(e);setStatus('Income save failed: '+e.message,'error')}finally{btn.disabled=false}});
+$('expenseForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!currentUser)return;const date=$('expenseDate').value,amount=safeNum($('expenseAmount')),note=$('expenseNote').value.trim();if(date!==todayKey()){setStatus('You can only add money removed for today. Previous days are locked.','error');return}if(amount<=0){setStatus('Enter an amount greater than zero.','error');return}const btn=$('saveExpenseBtn');btn.disabled=true;setStatus('Saving money removed…');try{const id=editingExpenseId||randomId(),old=expenses.find(r=>r.id===editingExpenseId);const data={date,amount,note,updatedAt:new Date().toISOString(),createdAt:old?.createdAt||new Date().toISOString()};await setDoc(doc(db,'users',currentUser.uid,'expenses',id),data);if(editingExpenseId)expenses=expenses.map(r=>r.id===id?{id,...data}:r);else expenses.push({id,...data});resetExpenseForm();renderRecords();setStatus('Money removed saved.','good')}catch(e){console.error(e);setStatus('Save failed: '+e.message,'error')}finally{btn.disabled=false}});
+$('calculateMonthBtn').addEventListener('click',()=>{const month=$('monthInput').value;if(!month){$('monthStatus').textContent='Choose a month first.';return}const today=todayKey(),end=month===today.slice(0,7)?today:(month+'-31');const inc=allIncomeRows().filter(r=>r.date.startsWith(month)&&r.date<=end).reduce((s,r)=>s+incomeTotal(r),0);const rem=expenses.filter(r=>r.date.startsWith(month)&&r.date<=end).reduce((s,r)=>s+(Number(r.amount)||0),0);$('monthIncomeStat').textContent=money(inc);$('monthRemovedStat').textContent=money(rem);const net=inc-rem;$('monthNetStat').textContent=money(net);$('monthNetStat').className='value '+(net<0?'negative':'positive');$('monthStatus').textContent=`Calculated ${month}-01 through ${end}. Net change is income minus money removed.`;monthlyCalculated=true});
+$('historyMonth').addEventListener('change',renderRecords);$('clearHistoryFilter').addEventListener('click',()=>{$('historyMonth').value='';renderRecords()});
+function refreshDateInputs(){$('incomeDate').value=todayKey();$('expenseDate').value=todayKey();if(!editingIncomeId)$('incomeDate').disabled=false;if(!editingExpenseId)$('expenseDate').disabled=false}
+setInterval(()=>{if(!editingIncomeId&&!editingExpenseId){refreshDateInputs()}},30000);
+refreshDateInputs();$('monthInput').value=todayKey().slice(0,7);updateIncomePreview();
 getRedirectResult(auth).catch(e=>setLoginStatus('Google sign-in error: '+e.message,'error'));
-onAuthStateChanged(auth,async user=>{currentUser=user;if(user){showLoggedIn(user);await loadRecords();}else{showLoggedOut();setLoginStatus('Sign in with Google to open your private log.');}});
+onAuthStateChanged(auth,async user=>{currentUser=user;if(user){showLoggedIn(user);await loadRecords()}else{showLoggedOut();setLoginStatus('Sign in with Google to open your private log.')}});
 </script>
 </body>
 </html>
