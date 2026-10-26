@@ -231,7 +231,16 @@
         }
 
         .tablewrap {
-            overflow-x: auto
+            max-height: 430px;
+            overflow: auto;
+            border-radius: 10px;
+        }
+
+        .tablewrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--panel);
         }
 
         table {
@@ -476,7 +485,7 @@
             </section>
         </main>
         <div class="foot">Private Cash Log · Keep your Google account secure. Cloud access depends on your Firebase
-            security rules. V2.0</div>
+            security rules. V 2.0</div>
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
