@@ -310,6 +310,70 @@
             color: var(--red)
         }
 
+
+        /* Compact one-section-at-a-time accordion */
+        .accordion-card {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .accordion-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 19px 20px;
+            border: 0;
+            background: transparent;
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            font: inherit;
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .accordion-toggle:hover {
+            background: rgba(255, 255, 255, .035);
+        }
+
+        .accordion-toggle:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: -3px;
+        }
+
+        .accordion-chevron {
+            flex: 0 0 auto;
+            color: var(--gold);
+            font-size: 22px;
+            line-height: 1;
+            transition: transform .18s ease;
+        }
+
+        .accordion-toggle[aria-expanded="true"] .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-panel {
+            padding: 0 20px 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        .accordion-panel[hidden] {
+            display: none !important;
+        }
+
+        @media(max-width:600px) {
+            .accordion-toggle {
+                padding: 17px 16px;
+            }
+
+            .accordion-panel {
+                padding: 0 16px 16px;
+            }
+        }
+
         @media(max-width:600px) {
             .wrap {
                 padding: 17px 12px 35px
@@ -515,7 +579,7 @@
             </section>
         </main>
         <div class="foot">Private Cash Log · Keep your Google account secure. Cloud access depends on your Firebase
-            security rules. V 2.0</div>
+            security rules. V 5.0</div>
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -525,6 +589,86 @@
         const appFirebase = initializeApp(firebaseConfig), auth = getAuth(appFirebase), db = getFirestore(appFirebase), provider = new GoogleAuthProvider();
         let currentUser = null, incomes = [], expenses = [], legacyDays = [], editingIncomeId = null, editingExpenseId = null, monthlyCalculated = false;
         const $ = id => document.getElementById(id);
+
+        function setupSectionAccordion() {
+            const app = $('app');
+            if (!app || app.dataset.accordionReady === 'true') return;
+
+            const configs = [
+                { selector: '#incomeForm', id: 'incomeSection', title: 'Add income transaction', open: true },
+                { selector: '#expenseForm', id: 'expenseSection', title: 'Record money removed', open: false },
+                { selector: '#calculateMonthBtn', id: 'monthlySection', title: 'Monthly calculation', open: false },
+                { selector: '#recordsBody', id: 'historySection', title: 'Transaction history', open: false }
+            ];
+            const sections = [];
+
+            for (const config of configs) {
+                const target = app.querySelector(config.selector);
+                const section = target?.closest('section.card');
+                if (!section) continue;
+
+                section.classList.add('accordion-card');
+                section.id = config.id;
+
+                // Remove the old title while leaving the original form/report/history markup intact.
+                const headings = [...section.querySelectorAll('h2')];
+                const heading = headings.find(h => h.textContent.trim().toLowerCase() === config.title.toLowerCase());
+                if (heading) {
+                    if (config.id === 'incomeSection' || config.id === 'expenseSection') {
+                        // Keep these IDs because the existing edit/save logic updates their text.
+                        heading.classList.add('hidden');
+                    } else {
+                        heading.remove();
+                    }
+                }
+
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'accordion-toggle';
+                toggle.id = `${config.id}Toggle`;
+                toggle.setAttribute('aria-controls', `${config.id}Panel`);
+                toggle.setAttribute('aria-expanded', String(config.open));
+                toggle.innerHTML = `<span>${config.title}</span><span class="accordion-chevron" aria-hidden="true">⌄</span>`;
+
+                const panel = document.createElement('div');
+                panel.className = 'accordion-panel';
+                panel.id = `${config.id}Panel`;
+                panel.hidden = !config.open;
+
+                while (section.firstChild) {
+                    const child = section.firstChild;
+                    section.removeChild(child);
+                    panel.appendChild(child);
+                }
+                section.append(toggle, panel);
+                sections.push({ section, toggle, panel });
+            }
+
+            function setOpen(active) {
+                for (const item of sections) {
+                    const open = item === active;
+                    item.toggle.setAttribute('aria-expanded', String(open));
+                    item.panel.hidden = !open;
+                    item.section.classList.toggle('accordion-open', open);
+                }
+            }
+
+            for (const item of sections) {
+                item.toggle.addEventListener('click', () => {
+                    const isOpen = item.toggle.getAttribute('aria-expanded') === 'true';
+                    if (isOpen) {
+                        // Keep one panel open at a time; clicking the current panel leaves it open.
+                        return;
+                    }
+                    setOpen(item);
+                });
+            }
+            const initial = sections.find(item => item.section.id === 'incomeSection') || sections[0];
+            if (initial) setOpen(initial);
+            app.dataset.accordionReady = 'true';
+        }
+        setupSectionAccordion();
+
         const localDateString = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const todayKey = () => localDateString(new Date());
         const money = n => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(Number(n) || 0);
