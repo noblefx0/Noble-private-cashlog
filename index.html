@@ -174,7 +174,9 @@
         }
 
         input,
-        textarea {
+        textarea,
+
+        select {
             width: 100%;
             border: 1px solid var(--line);
             border-radius: 11px;
@@ -186,7 +188,8 @@
         }
 
         input:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             border-color: var(--gold)
         }
 
@@ -404,7 +407,8 @@
             </section>
             <section class="card">
                 <h2 id="expenseFormTitle">Record money removed</h2>
-                <p class="muted small">Record money taken out of the business. This is kept separate from income. Only
+                <p class="muted small">Record money taken out of the business. Choose whether it came from cash or
+                    transfer. If the recorded balance is too low, you can cancel or confirm the removal anyway. Only
                     today's entries can be edited or deleted.</p>
                 <form id="expenseForm">
                     <div class="formgrid">
@@ -414,6 +418,11 @@
                                 id="expenseAmount" type="number" min="1" step="1" inputmode="numeric"
                                 placeholder="e.g. 1000" required></div>
                     </div>
+                    <div class="field"><label for="expenseSource">Money removed from</label><select id="expenseSource"
+                            required>
+                            <option value="cash">Cash</option>
+                            <option value="transfer">Transfer</option>
+                        </select></div>
                     <div class="field"><label for="expenseNote">Reason (optional)</label><input id="expenseNote"
                             maxlength="200" placeholder="e.g. personal withdrawal or business expense"></div>
                     <div class="row"><button id="saveExpenseBtn" class="btn" type="submit">Save money
@@ -444,16 +453,37 @@
                         <div id="monthIncomeStat" class="value">—</div>
                     </div>
                     <div class="stat">
+                        <div class="label">Cash removed</div>
+                        <div id="monthCashRemovedStat" class="value">—</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Transfer removed</div>
+                        <div id="monthTransferRemovedStat" class="value">—</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Older removals without a source</div>
+                        <div id="monthUnassignedRemovedStat" class="value">—</div>
+                    </div>
+                    <div class="stat">
                         <div class="label">Total money removed</div>
                         <div id="monthRemovedStat" class="value">—</div>
                     </div>
+                    <div class="stat">
+                        <div class="label">Cash remaining</div>
+                        <div id="monthCashRemainingStat" class="value">—</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Transfer remaining</div>
+                        <div id="monthTransferRemainingStat" class="value">—</div>
+                    </div>
                     <div class="stat total">
-                        <div class="label">Net change</div>
+                        <div class="label">Total remaining (net change)</div>
                         <div id="monthNetStat" class="value">—</div>
                     </div>
                 </div>
                 <div id="monthStatus" class="muted small" style="margin-top:10px">Choose a month and click Calculate
-                    month.</div>
+                    month. Older money-removal entries without a source are included in total removed, but not assigned
+                    to cash or transfer.</div>
             </section>
             <section class="card">
                 <div class="row" style="justify-content:space-between;align-items:center">
@@ -511,18 +541,18 @@
         function updateIncomePreview() { $('incomePreview').textContent = money(safeNum($('cashInput')) + safeNum($('transferInput'))) }
         function isToday(date) { return date === todayKey() }
         function resetIncomeForm() { editingIncomeId = null; $('incomeForm').reset(); $('incomeDate').value = todayKey(); $('incomeFormTitle').textContent = 'Add income transaction'; $('saveIncomeBtn').textContent = 'Save income'; $('cancelIncomeEditBtn').classList.add('hidden'); $('incomeDate').disabled = false; updateIncomePreview() }
-        function resetExpenseForm() { editingExpenseId = null; $('expenseForm').reset(); $('expenseDate').value = todayKey(); $('expenseFormTitle').textContent = 'Record money removed'; $('saveExpenseBtn').textContent = 'Save money removed'; $('cancelExpenseEditBtn').classList.add('hidden'); $('expenseDate').disabled = false }
+        function resetExpenseForm() { editingExpenseId = null; $('expenseForm').reset(); $('expenseDate').value = todayKey(); $('expenseSource').value = 'cash'; $('expenseSource').required = true; $('expenseFormTitle').textContent = 'Record money removed'; $('saveExpenseBtn').textContent = 'Save money removed'; $('cancelExpenseEditBtn').classList.add('hidden'); $('expenseDate').disabled = false; const legacyOption = $('expenseSource').querySelector('option[value="unassigned"]'); if (legacyOption) legacyOption.remove() }
         function collectionRef(name) { return collection(db, 'users', currentUser.uid, name) }
         async function loadRecords() { setStatus('Loading your cloud records…'); try { const [txSnap, exSnap, daysSnap] = await Promise.all([getDocs(collectionRef('transactions')), getDocs(collectionRef('expenses')), getDocs(collectionRef('days'))]); incomes = txSnap.docs.map(d => ({ id: d.id, ...d.data() })); expenses = exSnap.docs.map(d => ({ id: d.id, ...d.data() })); legacyDays = daysSnap.docs.map(d => ({ id: d.id, ...d.data(), legacy: true })); updateToday(); renderRecords(); setStatus('Your records are synced with Firebase.', 'good') } catch (e) { console.error(e); setStatus('Could not load records. Check Firestore security rules. Details: ' + e.message, 'error') } }
         function addAction(actions, label, cls, fn) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + cls; b.textContent = label; b.addEventListener('click', fn); actions.appendChild(b) }
         function renderRecords() {
             const body = $('recordsBody'); body.replaceChildren(); const month = $('historyMonth').value; const rows = [...allIncomeRows().map(r => ({ ...r, recordType: 'income' })), ...expenses.map(r => ({ ...r, recordType: 'expense', amount: Number(r.amount) || 0 }))].filter(r => !month || r.date.startsWith(month)).sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || '').localeCompare(a.createdAt || '')); $('emptyRecords').classList.toggle('hidden', rows.length > 0); $('recordsBody').closest('table').classList.toggle('hidden', rows.length === 0); $('recordCount').textContent = `${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`;
-            for (const r of rows) { const tr = document.createElement('tr'); const values = [r.date, r.recordType === 'income' ? 'Income' : 'Money removed', r.recordType === 'income' ? money(r.cash) : '—', r.recordType === 'income' ? money(r.transfer) : '—', money(r.amount), r.note || '']; for (const v of values) { const td = document.createElement('td'); td.textContent = v; if (typeof v === 'string' && v.startsWith('₦')) td.className = 'amount'; tr.appendChild(td) } const td = document.createElement('td'), actions = document.createElement('div'); actions.className = 'actions'; if (isToday(r.date)) { if (r.recordType === 'income' && r.kind === 'legacy') { addAction(actions, 'Edit', 'secondary', () => editLegacy(r)); addAction(actions, 'Delete', 'danger', () => deleteLegacy(r)) } else if (r.recordType === 'income') { addAction(actions, 'Edit', 'secondary', () => editIncome(r)); addAction(actions, 'Delete', 'danger', () => deleteIncome(r)) } else { addAction(actions, 'Edit', 'secondary', () => editExpense(r)); addAction(actions, 'Delete', 'danger', () => deleteExpense(r)) } } else { const locked = document.createElement('span'); locked.className = 'pill'; locked.textContent = 'Locked'; actions.appendChild(locked) } td.appendChild(actions); tr.appendChild(td); body.appendChild(tr) }
+            for (const r of rows) { const tr = document.createElement('tr'); const expenseType = r.recordType === 'expense' ? (r.source === 'cash' ? 'Money removed (Cash)' : r.source === 'transfer' ? 'Money removed (Transfer)' : 'Money removed (older entry; source unknown)') : 'Income'; const values = [r.date, r.recordType === 'income' ? 'Income' : expenseType, r.recordType === 'income' ? money(r.cash) : '—', r.recordType === 'income' ? money(r.transfer) : '—', money(r.amount), r.note || '']; for (const v of values) { const td = document.createElement('td'); td.textContent = v; if (typeof v === 'string' && v.startsWith('₦')) td.className = 'amount'; tr.appendChild(td) } const td = document.createElement('td'), actions = document.createElement('div'); actions.className = 'actions'; if (isToday(r.date)) { if (r.recordType === 'income' && r.kind === 'legacy') { addAction(actions, 'Edit', 'secondary', () => editLegacy(r)); addAction(actions, 'Delete', 'danger', () => deleteLegacy(r)) } else if (r.recordType === 'income') { addAction(actions, 'Edit', 'secondary', () => editIncome(r)); addAction(actions, 'Delete', 'danger', () => deleteIncome(r)) } else { addAction(actions, 'Edit', 'secondary', () => editExpense(r)); addAction(actions, 'Delete', 'danger', () => deleteExpense(r)) } } else { const locked = document.createElement('span'); locked.className = 'pill'; locked.textContent = 'Locked'; actions.appendChild(locked) } td.appendChild(actions); tr.appendChild(td); body.appendChild(tr) }
             updateToday()
         }
         function editIncome(r) { if (!isToday(r.date)) return alert('Only today’s entries can be edited.'); editingIncomeId = r.id; $('incomeDate').value = r.date; $('incomeDate').disabled = true; $('cashInput').value = r.cash; $('transferInput').value = r.transfer; $('incomeNote').value = r.note || ''; $('incomeFormTitle').textContent = 'Edit today’s income'; $('saveIncomeBtn').textContent = 'Update income'; $('cancelIncomeEditBtn').classList.remove('hidden'); updateIncomePreview(); window.scrollTo({ top: 0, behavior: 'smooth' }) }
         function editLegacy(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); editingIncomeId = 'legacy:' + r.date; $('incomeDate').value = r.date; $('incomeDate').disabled = true; $('cashInput').value = r.cash; $('transferInput').value = r.transfer; $('incomeNote').value = r.note || ''; $('incomeFormTitle').textContent = 'Edit today’s original daily record'; $('saveIncomeBtn').textContent = 'Update record'; $('cancelIncomeEditBtn').classList.remove('hidden'); updateIncomePreview(); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-        function editExpense(r) { if (!isToday(r.date)) return alert('Only today’s entries can be edited.'); editingExpenseId = r.id; $('expenseDate').value = r.date; $('expenseDate').disabled = true; $('expenseAmount').value = r.amount; $('expenseNote').value = r.note || ''; $('expenseFormTitle').textContent = 'Edit today’s money removed'; $('saveExpenseBtn').textContent = 'Update removal'; $('cancelExpenseEditBtn').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+        function editExpense(r) { if (!isToday(r.date)) return alert('Only today’s entries can be edited.'); editingExpenseId = r.id; $('expenseDate').value = r.date; $('expenseDate').disabled = true; $('expenseAmount').value = r.amount; $('expenseNote').value = r.note || ''; const existingUnknown = !['cash', 'transfer'].includes(r.source); let unknownOption = $('expenseSource').querySelector('option[value="unassigned"]'); if (existingUnknown && !unknownOption) { unknownOption = document.createElement('option'); unknownOption.value = 'unassigned'; unknownOption.textContent = 'Unknown (older entry)'; $('expenseSource').appendChild(unknownOption) } $('expenseSource').value = existingUnknown ? 'unassigned' : r.source; $('expenseSource').required = !existingUnknown; $('expenseFormTitle').textContent = 'Edit today’s money removed'; $('saveExpenseBtn').textContent = 'Update removal'; $('cancelExpenseEditBtn').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }) }
         async function deleteIncome(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); if (!confirm('Delete this income entry?')) return; try { await deleteDoc(doc(db, 'users', currentUser.uid, 'transactions', r.id)); incomes = incomes.filter(x => x.id !== r.id); renderRecords(); setStatus('Income entry deleted.', 'good') } catch (e) { setStatus('Delete failed: ' + e.message, 'error') } }
         async function deleteLegacy(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); if (!confirm('Delete today’s original daily record?')) return; try { await deleteDoc(doc(db, 'users', currentUser.uid, 'days', r.date)); legacyDays = legacyDays.filter(x => x.date !== r.date); renderRecords(); setStatus('Today’s original record deleted.', 'good') } catch (e) { setStatus('Delete failed: ' + e.message, 'error') } }
         async function deleteExpense(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); if (!confirm('Delete this money-removal entry?')) return; try { await deleteDoc(doc(db, 'users', currentUser.uid, 'expenses', r.id)); expenses = expenses.filter(x => x.id !== r.id); renderRecords(); setStatus('Money-removal entry deleted.', 'good') } catch (e) { setStatus('Delete failed: ' + e.message, 'error') } }
@@ -531,12 +561,88 @@
         $('signOutBtn').addEventListener('click', () => signOut(auth));
         $('cashInput').addEventListener('input', updateIncomePreview); $('transferInput').addEventListener('input', updateIncomePreview); $('cancelIncomeEditBtn').addEventListener('click', resetIncomeForm); $('cancelExpenseEditBtn').addEventListener('click', resetExpenseForm);
         $('incomeForm').addEventListener('submit', async ev => { ev.preventDefault(); if (!currentUser) return; const date = $('incomeDate').value; if (date !== todayKey()) { setStatus('You can only add income for today. Previous days are locked.', 'error'); return } const cash = safeNum($('cashInput')), transfer = safeNum($('transferInput')), note = $('incomeNote').value.trim(); if (cash + transfer <= 0) { setStatus('Enter an amount greater than zero.', 'error'); return } const btn = $('saveIncomeBtn'); btn.disabled = true; setStatus('Saving income to the cloud…'); try { const data = { date, cash, transfer, note, updatedAt: new Date().toISOString() }; if (editingIncomeId?.startsWith('legacy:')) { const oldDate = editingIncomeId.slice(7); await setDoc(doc(db, 'users', currentUser.uid, 'days', oldDate), { date: oldDate, cash, transfer, note, updatedAt: new Date().toISOString() }); legacyDays = legacyDays.map(r => r.date === oldDate ? { ...r, ...data, id: oldDate } : r) } else { const id = editingIncomeId || randomId(); data.createdAt = editingIncomeId ? (incomes.find(r => r.id === editingIncomeId)?.createdAt || new Date().toISOString()) : new Date().toISOString(); await setDoc(doc(db, 'users', currentUser.uid, 'transactions', id), data); if (editingIncomeId) incomes = incomes.map(r => r.id === id ? { id, ...data } : r); else incomes.push({ id, ...data }) } resetIncomeForm(); renderRecords(); setStatus('Income saved.', 'good') } catch (e) { console.error(e); setStatus('Income save failed: ' + e.message, 'error') } finally { btn.disabled = false } });
-        $('expenseForm').addEventListener('submit', async ev => { ev.preventDefault(); if (!currentUser) return; const date = $('expenseDate').value, amount = safeNum($('expenseAmount')), note = $('expenseNote').value.trim(); if (date !== todayKey()) { setStatus('You can only add money removed for today. Previous days are locked.', 'error'); return } if (amount <= 0) { setStatus('Enter an amount greater than zero.', 'error'); return } const btn = $('saveExpenseBtn'); btn.disabled = true; setStatus('Saving money removed…'); try { const id = editingExpenseId || randomId(), old = expenses.find(r => r.id === editingExpenseId); const data = { date, amount, note, updatedAt: new Date().toISOString(), createdAt: old?.createdAt || new Date().toISOString() }; await setDoc(doc(db, 'users', currentUser.uid, 'expenses', id), data); if (editingExpenseId) expenses = expenses.map(r => r.id === id ? { id, ...data } : r); else expenses.push({ id, ...data }); resetExpenseForm(); renderRecords(); setStatus('Money removed saved.', 'good') } catch (e) { console.error(e); setStatus('Save failed: ' + e.message, 'error') } finally { btn.disabled = false } });
-        $('calculateMonthBtn').addEventListener('click', () => { const month = $('monthInput').value; if (!month) { $('monthStatus').textContent = 'Choose a month first.'; return } const today = todayKey(), [year, monthNumber] = month.split('-').map(Number), lastDay = new Date(year, monthNumber, 0).getDate(), monthEnd = `${month}-${String(lastDay).padStart(2, '0')}`, end = month === today.slice(0, 7) ? today : monthEnd; const rows = allIncomeRows().filter(r => r.date.startsWith(month) && r.date <= end); const cash = rows.reduce((s, r) => s + (Number(r.cash) || 0), 0); const transfer = rows.reduce((s, r) => s + (Number(r.transfer) || 0), 0); const inc = cash + transfer; const rem = expenses.filter(r => r.date.startsWith(month) && r.date <= end).reduce((s, r) => s + (Number(r.amount) || 0), 0); $('monthCashStat').textContent = money(cash); $('monthTransferStat').textContent = money(transfer); $('monthIncomeStat').textContent = money(inc); $('monthRemovedStat').textContent = money(rem); const net = inc - rem; $('monthNetStat').textContent = money(net); $('monthNetStat').className = 'value ' + (net < 0 ? 'negative' : 'positive'); $('monthStatus').textContent = `Calculated ${month}-01 through ${end}. Net change is income minus money removed.`; monthlyCalculated = true });
+        function sourceBalanceForMonth(source, month, throughDate) {
+            const income = allIncomeRows().filter(r => r.date.startsWith(month) && r.date <= throughDate)
+                .reduce((sum, r) => sum + (Number(r[source]) || 0), 0);
+            const removed = expenses.filter(r => r.date.startsWith(month) && r.date <= throughDate && r.source === source)
+                .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            return income - removed;
+        }
+        $('expenseForm').addEventListener('submit', async ev => {
+            ev.preventDefault();
+            if (!currentUser) return;
+            const date = $('expenseDate').value, amount = safeNum($('expenseAmount')),
+                note = $('expenseNote').value.trim(), source = $('expenseSource').value;
+            if (date !== todayKey()) { setStatus('You can only add money removed for today. Previous days are locked.', 'error'); return }
+            if (amount <= 0) { setStatus('Enter an amount greater than zero.', 'error'); return }
+            if (!['cash', 'transfer'].includes(source) && !(editingExpenseId && expenses.find(r => r.id === editingExpenseId && !['cash', 'transfer'].includes(r.source)))) {
+                setStatus('Choose whether the money was removed from cash or transfer.', 'error'); return;
+            }
+            const old = expenses.find(r => r.id === editingExpenseId);
+            const month = date.slice(0, 7);
+            let available = null;
+            if (source === 'cash' || source === 'transfer') {
+                available = sourceBalanceForMonth(source, month, date);
+                if (editingExpenseId && old && old.source === source) available += Number(old.amount) || 0;
+                if (amount > available) {
+                    const shortfall = amount - available;
+                    const sourceName = source === 'cash' ? 'cash' : 'transfer';
+                    const warning = `Your recorded ${sourceName} balance for ${month} is ${money(available)}. You are trying to remove ${money(amount)}, which is ${money(shortfall)} more than the recorded balance.
+
+If you continue, the calculated ${sourceName} balance will become ${money(available - amount)}.
+
+Older money-removal entries without a source are not included in this source balance. Continue anyway?`;
+                    if (!confirm(warning)) return;
+                }
+            }
+            const btn = $('saveExpenseBtn'); btn.disabled = true; setStatus('Saving money removed…');
+            try {
+                const id = editingExpenseId || randomId();
+                const data = { date, amount, source, note, updatedAt: new Date().toISOString(), createdAt: old?.createdAt || new Date().toISOString() };
+                if (source === 'unassigned') delete data.source;
+                await setDoc(doc(db, 'users', currentUser.uid, 'expenses', id), data);
+                if (editingExpenseId) expenses = expenses.map(r => r.id === id ? { id, ...data } : r);
+                else expenses.push({ id, ...data });
+                resetExpenseForm(); renderRecords(); setStatus('Money removed saved.', 'good');
+            } catch (e) { console.error(e); setStatus('Save failed: ' + e.message, 'error') }
+            finally { btn.disabled = false }
+        });
+        $('calculateMonthBtn').addEventListener('click', () => {
+            const month = $('monthInput').value;
+            if (!month) { $('monthStatus').textContent = 'Choose a month first.'; return }
+            const today = todayKey(), [year, monthNumber] = month.split('-').map(Number),
+                lastDay = new Date(year, monthNumber, 0).getDate(), monthEnd = `${month}-${String(lastDay).padStart(2, '0')}`,
+                end = month === today.slice(0, 7) ? today : monthEnd;
+            const rows = allIncomeRows().filter(r => r.date.startsWith(month) && r.date <= end);
+            const cash = rows.reduce((sum, r) => sum + (Number(r.cash) || 0), 0);
+            const transfer = rows.reduce((sum, r) => sum + (Number(r.transfer) || 0), 0);
+            const inc = cash + transfer;
+            const monthExpenses = expenses.filter(r => r.date.startsWith(month) && r.date <= end);
+            const cashRemoved = monthExpenses.filter(r => r.source === 'cash').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const transferRemoved = monthExpenses.filter(r => r.source === 'transfer').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const unassignedRemoved = monthExpenses.filter(r => !['cash', 'transfer'].includes(r.source)).reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const rem = cashRemoved + transferRemoved + unassignedRemoved;
+            const cashRemaining = cash - cashRemoved, transferRemaining = transfer - transferRemoved, net = inc - rem;
+            $('monthCashStat').textContent = money(cash);
+            $('monthTransferStat').textContent = money(transfer);
+            $('monthIncomeStat').textContent = money(inc);
+            $('monthCashRemovedStat').textContent = money(cashRemoved);
+            $('monthTransferRemovedStat').textContent = money(transferRemoved);
+            $('monthUnassignedRemovedStat').textContent = money(unassignedRemoved);
+            $('monthRemovedStat').textContent = money(rem);
+            $('monthCashRemainingStat').textContent = money(cashRemaining);
+            $('monthTransferRemainingStat').textContent = money(transferRemaining);
+            $('monthNetStat').textContent = money(net);
+            $('monthCashRemainingStat').className = 'value ' + (cashRemaining < 0 ? 'negative' : 'positive');
+            $('monthTransferRemainingStat').className = 'value ' + (transferRemaining < 0 ? 'negative' : 'positive');
+            $('monthNetStat').className = 'value ' + (net < 0 ? 'negative' : 'positive');
+            $('monthStatus').textContent = `Calculated ${month}-01 through ${end}. Cash and transfer balances are calculated separately. Total remaining = total income − all money removed. Older removals without a source are included in total removed only.`;
+            monthlyCalculated = true;
+        });
         $('historyMonth').addEventListener('change', renderRecords); $('clearHistoryFilter').addEventListener('click', () => { $('historyMonth').value = ''; renderRecords() });
         function refreshDateInputs() { $('incomeDate').value = todayKey(); $('expenseDate').value = todayKey(); if (!editingIncomeId) $('incomeDate').disabled = false; if (!editingExpenseId) $('expenseDate').disabled = false }
         setInterval(() => { if (!editingIncomeId && !editingExpenseId) { refreshDateInputs() } }, 30000);
-        refreshDateInputs(); $('monthInput').value = todayKey().slice(0, 7); updateIncomePreview();
+        refreshDateInputs(); $('expenseSource').value = 'cash'; $('monthInput').value = todayKey().slice(0, 7); updateIncomePreview();
         getRedirectResult(auth).catch(e => setLoginStatus('Google sign-in error: ' + e.message, 'error'));
         onAuthStateChanged(auth, async user => { currentUser = user; if (user) { showLoggedIn(user); await loadRecords() } else { showLoggedOut(); setLoginStatus('Sign in with Google to open your private log.') } });
     </script>
