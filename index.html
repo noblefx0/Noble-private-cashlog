@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101827">
-    <title>Private Cash Log</title>
+    <title>Cash Log</title>
     <style>
         :root {
             color-scheme: dark;
@@ -515,6 +515,159 @@
                 width: 100%
             }
         }
+
+        /* V2 theme support */
+        body.light {
+            color-scheme: light;
+            --bg: #f4f6fa;
+            --panel: #ffffff;
+            --panel2: #f0f3f8;
+            --text: #172033;
+            --muted: #657187;
+            --line: #dce2eb;
+            --gold: #b77908;
+            --green: #16834a;
+            --red: #c03950;
+            background: linear-gradient(180deg, #ffffff 0%, #f3f6fb 55%, #edf1f7 100%);
+        }
+
+        body.light .card {
+            background: var(--panel);
+            box-shadow: 0 8px 26px #18243a0d;
+        }
+
+        body.light input,
+        body.light textarea,
+        body.light select {
+            background: #fff;
+            color: var(--text);
+        }
+
+        body.light .bottom-nav {
+            background: rgba(255, 255, 255, .96);
+            box-shadow: 0 -8px 24px #18243a12;
+        }
+
+        body.light .status {
+            background: #eef3fa;
+            color: #40506a;
+        }
+
+        body.light .status.error {
+            background: #fff0f1;
+            color: #9d2639;
+        }
+
+        body.light .status.good {
+            background: #eaf8ef;
+            color: #17683b;
+        }
+
+        body.light .btn.secondary {
+            background: #f0f3f8;
+            color: #172033;
+            border-color: #dce2eb;
+        }
+
+        body.light .btn.danger {
+            background: #fff0f1;
+            color: #9d2639;
+            border-color: #f1c6cd;
+        }
+
+        .theme-btn {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 9px 13px;
+            background: var(--panel2);
+            color: var(--text);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .auth-field {
+            margin: 12px 0;
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .auth-actions .btn {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .auth-link {
+            border: 0;
+            background: none;
+            color: var(--gold);
+            font: inherit;
+            font-weight: 700;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 12px;
+            margin: 17px 0;
+        }
+
+        .auth-divider:before,
+        .auth-divider:after {
+            content: "";
+            height: 1px;
+            background: var(--line);
+            flex: 1;
+        }
+
+        #mainStatus {
+            display: none !important;
+        }
+
+        #loginStatus {
+            display: none !important;
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 92px;
+            transform: translate(-50%, 14px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            max-width: min(92vw, 460px);
+            padding: 11px 16px;
+            border-radius: 12px;
+            background: #172033;
+            color: #fff;
+            box-shadow: 0 8px 24px #0003;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        #toast.error {
+            background: #9d2639;
+        }
+
+        body.light #toast {
+            background: #172033;
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -528,13 +681,32 @@
                     <p>Your personal money tracker.</p>
                 </div>
             </div>
-
+            <button id="themeToggle" class="theme-btn" type="button" aria-label="Switch colour theme">☀️ Light
+                mode</button>
         </header>
         <section id="loginCard" class="card">
-            <h2>Sign in to your private log</h2>
-            <p class="muted">Use your Google account to access your private records. Your data is stored under your
-                account.</p><button id="signInBtn" class="btn">Continue with Google</button>
-            <div id="loginStatus" class="status">Connecting to Firebase…</div>
+            <h2 id="authTitle">Welcome to Cash Log</h2>
+            <p class="muted">Sign in to access your personal records, or create a free account.</p>
+            <form id="emailAuthForm">
+                <div class="field auth-field" id="nameField"><label for="authName">Your name</label><input id="authName"
+                        type="text" maxlength="60" autocomplete="name" placeholder="Enter your name"></div>
+                <div class="field auth-field"><label for="authEmail">Email address</label><input id="authEmail"
+                        type="email" autocomplete="email" placeholder="you@example.com" required></div>
+                <div class="field auth-field"><label for="authPassword">Password</label><input id="authPassword"
+                        type="password" minlength="6" autocomplete="current-password"
+                        placeholder="At least 6 characters" required></div>
+                <div class="row" style="justify-content:space-between"><label
+                        style="display:flex;align-items:center;gap:8px;font-weight:500"><input id="showPassword"
+                            type="checkbox" style="width:auto"> Show password</label><button id="forgotPasswordBtn"
+                        class="auth-link" type="button">Forgot password?</button></div>
+                <div class="auth-actions"><button id="emailSubmitBtn" class="btn" type="submit">Log in</button></div>
+            </form>
+            <button id="authModeBtn" class="auth-link" type="button">New here? Create an account</button>
+            <p class="small muted" style="margin:8px 0 0">Already use Google? Sign in with Google first, then add a
+                password from your account.</p>
+            <div class="auth-divider">OR</div>
+            <button id="signInBtn" class="btn secondary" style="width:100%" type="button">Continue with Google</button>
+            <div id="loginStatus" class="status"> </div>
         </section>
         <main id="app" class="hidden">
             <div class="app-header">
@@ -543,8 +715,28 @@
                     <h2 id="displayName" style="margin:2px 0 0">Your Cash Log</h2>
                 </div>
                 <div id="userArea" class="row" style="flex:0 1 auto"><span id="userEmail"
-                        class="small muted"></span><button id="signOutBtn" class="btn secondary">Sign out</button></div>
+                        class="small muted"></span><button id="accountPasswordBtn" class="btn secondary hidden"
+                        type="button">Set up password</button><button id="signOutBtn" class="btn secondary">Sign
+                        out</button></div>
             </div>
+            <section id="accountPasswordPanel" class="card hidden" style="margin:12px 0">
+                <h3 style="margin-top:0">Add a password to this account</h3>
+                <p class="small muted">This links email/password sign-in to your current Google account. Your Firebase
+                    account and existing records stay the same.</p>
+                <form id="linkPasswordForm">
+                    <div class="field auth-field"><label for="linkPassword">New password</label><input id="linkPassword"
+                            type="password" minlength="6" autocomplete="new-password"
+                            placeholder="At least 6 characters" required></div>
+                    <div class="field auth-field"><label for="linkPasswordConfirm">Confirm password</label><input
+                            id="linkPasswordConfirm" type="password" minlength="6" autocomplete="new-password"
+                            placeholder="Enter the same password again" required></div>
+                    <label style="display:flex;align-items:center;gap:8px;font-weight:500"><input id="showLinkPassword"
+                            type="checkbox" style="width:auto"> Show passwords</label>
+                    <div class="auth-actions"><button id="linkPasswordSubmit" class="btn" type="submit">Save
+                            password</button><button id="cancelLinkPassword" class="btn secondary"
+                            type="button">Cancel</button></div>
+                </form>
+            </section>
             <div id="mainStatus" class="status">Loading your records…</div>
             <section id="homeScreen" class="screen active">
                 <h2 class="screen-heading">Overview</h2>
@@ -777,9 +969,10 @@
         </main>
         <div class="foot">Cash Log · Your records are private to your signed-in account.</div>
     </div>
+    <div id="toast" role="status" aria-live="polite"></div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, EmailAuthProvider, linkWithCredential } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
         const firebaseConfig = { apiKey: "AIzaSyA0PfsjFQCxx17sPQdsAK69quONGpJHUvE", authDomain: "noble-private-cash-log.firebaseapp.com", databaseURL: "https://noble-private-cash-log-default-rtdb.europe-west1.firebasedatabase.app", projectId: "noble-private-cash-log", storageBucket: "noble-private-cash-log.firebasestorage.app", messagingSenderId: "532091769228", appId: "1:532091769228:web:812a82176516069d3386a9" };
         const appFirebase = initializeApp(firebaseConfig), auth = getAuth(appFirebase), db = getFirestore(appFirebase), provider = new GoogleAuthProvider();
@@ -802,10 +995,54 @@
         const todayKey = () => localDateString(new Date());
         const money = n => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(Number(n) || 0);
         const safeNum = el => Math.max(0, Number(el.value) || 0);
-        function setStatus(m, t = '') { const e = $('mainStatus'); e.textContent = m; e.className = 'status ' + t }
-        function setLoginStatus(m, t = '') { const e = $('loginStatus'); e.textContent = m; e.className = 'status ' + t }
-        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log'; $('userEmail').textContent = u.displayName || 'Signed in' }
+        let toastTimer = null;
+        function toast(message, type = '') { const el = $('toast'); el.textContent = message; el.className = type; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600); }
+        function friendlyError(e) { const c = e?.code || ''; return ({ 'auth/email-already-in-use': 'An account already exists with this email. Try logging in.', 'auth/invalid-email': 'Enter a valid email address.', 'auth/weak-password': 'Choose a stronger password with at least 6 characters.', 'auth/user-not-found': 'No account found with that email.', 'auth/wrong-password': 'Incorrect email or password.', 'auth/invalid-credential': 'Incorrect email or password.', 'auth/too-many-requests': 'Too many attempts. Please wait a little and try again.', 'auth/operation-not-allowed': 'Email and password sign-in has not been enabled in Firebase yet.', 'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Try again or use email login.', 'auth/network-request-failed': 'Network problem. Check your internet connection.', 'auth/provider-already-linked': 'This account already has email and password sign-in enabled.', 'auth/credential-already-in-use': 'This email/password is already linked to another account. Sign in to that account instead.', 'auth/email-already-in-use': 'This email is already connected to another account. No changes were made to your current account.', 'auth/requires-recent-login': 'For security, sign out and sign in with Google again, then retry.' })[c] || 'Something went wrong. Please try again.'; }
+        function setStatus(m, t = '') { if (/failed|could not|error/i.test(m)) toast(/security rules|Firebase|cloud records/i.test(m) ? 'Could not load your records. Please try again later.' : m.replace(/Details:.*/i, '').replace(/Save failed:.*/i, 'Please try again.'), 'error'); else if (/saved|deleted|updated/i.test(m)) toast(m.replace(/Internal transfer saved.*/i, 'Transfer completed successfully.')); }
+        function setLoginStatus(m, t = '') { if (m && /failed|error/i.test(m)) toast(m.replace(/Sign-in failed:.*/i, 'Sign-in failed. Please try again.'), 'error'); }
+        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log'; $('userEmail').textContent = u.displayName || 'Signed in'; }
         function showLoggedOut() { $('loginCard').classList.remove('hidden'); $('app').classList.add('hidden'); $('userArea').classList.add('hidden') }
+        let authMode = 'login';
+        function setAuthMode(mode) { authMode = mode; const creating = mode === 'signup'; $('authTitle').textContent = creating ? 'Create your account' : 'Welcome back'; $('nameField').classList.toggle('hidden', !creating); $('authName').required = creating; $('authPassword').autocomplete = creating ? 'new-password' : 'current-password'; $('emailSubmitBtn').textContent = creating ? 'Create account' : 'Log in'; $('authModeBtn').textContent = creating ? 'Already have an account? Log in' : 'New here? Create an account'; $('forgotPasswordBtn').classList.toggle('hidden', creating); }
+        function applyTheme(theme) { const light = theme === 'light'; document.body.classList.toggle('light', light); $('themeToggle').textContent = light ? '🌙 Dark mode' : '☀️ Light mode'; document.querySelector('meta[name="theme-color"]').content = light ? '#f4f6fa' : '#101827'; try { localStorage.setItem('cashLogTheme', theme); } catch (_) { } }
+        applyTheme((() => { try { return localStorage.getItem('cashLogTheme') || 'dark' } catch (_) { return 'dark' } })());
+        $('themeToggle').addEventListener('click', () => applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'));
+        $('authModeBtn').addEventListener('click', () => setAuthMode(authMode === 'login' ? 'signup' : 'login'));
+        $('showPassword').addEventListener('change', () => { $('authPassword').type = $('showPassword').checked ? 'text' : 'password' });
+        $('emailAuthForm').addEventListener('submit', async ev => { ev.preventDefault(); const email = $('authEmail').value.trim(), password = $('authPassword').value, name = $('authName').value.trim(); const btn = $('emailSubmitBtn'); btn.disabled = true; try { if (authMode === 'signup') { if (!name) { toast('Enter your name to create an account.', 'error'); return; } const cred = await createUserWithEmailAndPassword(auth, email, password); await updateProfile(cred.user, { displayName: name }); showLoggedIn(cred.user); toast('Your account is ready.'); } else { await signInWithEmailAndPassword(auth, email, password); } } catch (e) { toast(friendlyError(e), 'error'); } finally { btn.disabled = false; } });
+        $('forgotPasswordBtn').addEventListener('click', async () => { const email = $('authEmail').value.trim(); if (!email) { toast('Enter your email address first.', 'error'); return; } try { await sendPasswordResetEmail(auth, email); toast('Password reset email sent. Check your inbox.'); } catch (e) { toast(friendlyError(e), 'error'); } });
+        setAuthMode('login');
+        function refreshPasswordLinkUI(user) {
+            const hasPassword = !!user?.providerData?.some(p => p.providerId === 'password');
+            const isGoogle = !!user?.providerData?.some(p => p.providerId === 'google.com');
+            $('accountPasswordBtn').classList.toggle('hidden', !user || hasPassword || !isGoogle);
+            if (hasPassword) { $('accountPasswordPanel').classList.add('hidden'); $('accountPasswordBtn').textContent = 'Password enabled'; $('accountPasswordBtn').classList.remove('hidden'); $('accountPasswordBtn').disabled = true; }
+            else { $('accountPasswordBtn').disabled = false; $('accountPasswordBtn').textContent = 'Set up password'; }
+        }
+        $('accountPasswordBtn').addEventListener('click', () => $('accountPasswordPanel').classList.toggle('hidden'));
+        $('cancelLinkPassword').addEventListener('click', () => { $('accountPasswordPanel').classList.add('hidden'); $('linkPasswordForm').reset(); $('linkPassword').type = 'password'; $('linkPasswordConfirm').type = 'password'; });
+        $('showLinkPassword').addEventListener('change', () => { const type = $('showLinkPassword').checked ? 'text' : 'password'; $('linkPassword').type = type; $('linkPasswordConfirm').type = type; });
+        $('linkPasswordForm').addEventListener('submit', async ev => {
+            ev.preventDefault();
+            if (!auth.currentUser || !currentUser) { toast('Please sign in with Google again.', 'error'); return; }
+            const password = $('linkPassword').value, confirmation = $('linkPasswordConfirm').value;
+            if (password.length < 6) { toast('Choose a password with at least 6 characters.', 'error'); return; }
+            if (password !== confirmation) { toast('The passwords do not match.', 'error'); return; }
+            if (!currentUser.email) { toast('This Google account has no email address available.', 'error'); return; }
+            const btn = $('linkPasswordSubmit'); btn.disabled = true;
+            try {
+                const credential = EmailAuthProvider.credential(currentUser.email, password);
+                const result = await linkWithCredential(auth.currentUser, credential);
+                currentUser = result.user;
+                await result.user.reload();
+                currentUser = auth.currentUser;
+                refreshPasswordLinkUI(currentUser);
+                $('accountPasswordPanel').classList.add('hidden');
+                $('linkPasswordForm').reset();
+                toast('Password added to your existing account. You can now sign in with Google or email and password.');
+            } catch (e) { console.error(e); toast(friendlyError(e), 'error'); }
+            finally { btn.disabled = false; }
+        });
         function incomeTotal(r) { return (Number(r.cash) || 0) + (Number(r.transfer) || 0) }
         function allIncomeRows() { return [...legacyDays.map(r => ({ ...r, kind: 'legacy', id: r.id || r.date, amount: incomeTotal(r) })), ...incomes.map(r => ({ ...r, kind: 'income', amount: incomeTotal(r) }))] }
         function todayIncome() { return allIncomeRows().filter(r => r.date === todayKey()) }
@@ -852,7 +1089,7 @@
         async function deleteLegacy(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); if (!confirm('Delete today’s original daily record?')) return; try { await deleteDoc(doc(db, 'users', currentUser.uid, 'days', r.date)); legacyDays = legacyDays.filter(x => x.date !== r.date); renderRecords(); setStatus('Today’s original record deleted.', 'good') } catch (e) { setStatus('Delete failed: ' + e.message, 'error') } }
         async function deleteExpense(r) { if (!isToday(r.date)) return alert('Previous-day records are locked.'); if (!confirm('Delete this money-removal entry?')) return; try { await deleteDoc(doc(db, 'users', currentUser.uid, 'expenses', r.id)); expenses = expenses.filter(x => x.id !== r.id); renderRecords(); setStatus('Money-removal entry deleted.', 'good') } catch (e) { setStatus('Delete failed: ' + e.message, 'error') } }
         function randomId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}` }
-        $('signInBtn').addEventListener('click', async () => { $('signInBtn').disabled = true; setLoginStatus('Opening Google sign-in…'); try { await signInWithPopup(auth, provider) } catch (e) { console.error(e); if (e.code === 'auth/popup-blocked') { try { await signInWithRedirect(auth, provider); return } catch (er) { e = er } } setLoginStatus('Sign-in failed: ' + e.message, 'error') } finally { $('signInBtn').disabled = false } });
+        $('signInBtn').addEventListener('click', async () => { $('signInBtn').disabled = true; try { await signInWithPopup(auth, provider) } catch (e) { console.error(e); if (e.code === 'auth/popup-blocked') { try { await signInWithRedirect(auth, provider); return } catch (er) { e = er } } toast(friendlyError(e), 'error'); } finally { $('signInBtn').disabled = false } });
         $('signOutBtn').addEventListener('click', () => signOut(auth));
         $('cashInput').addEventListener('input', updateIncomePreview); $('transferInput').addEventListener('input', updateIncomePreview); $('cancelIncomeEditBtn').addEventListener('click', resetIncomeForm); $('cancelExpenseEditBtn').addEventListener('click', resetExpenseForm);
         $('incomeForm').addEventListener('submit', async ev => { ev.preventDefault(); if (!currentUser) return; const date = $('incomeDate').value; if (date !== todayKey()) { setStatus('You can only add income for today. Previous days are locked.', 'error'); return } const cash = safeNum($('cashInput')), transfer = safeNum($('transferInput')), note = $('incomeNote').value.trim(); if (cash + transfer <= 0) { setStatus('Enter an amount greater than zero.', 'error'); return } const btn = $('saveIncomeBtn'); btn.disabled = true; setStatus('Saving income to the cloud…'); try { const data = { date, cash, transfer, note, updatedAt: new Date().toISOString() }; if (editingIncomeId?.startsWith('legacy:')) { const oldDate = editingIncomeId.slice(7); await setDoc(doc(db, 'users', currentUser.uid, 'days', oldDate), { date: oldDate, cash, transfer, note, updatedAt: new Date().toISOString() }); legacyDays = legacyDays.map(r => r.date === oldDate ? { ...r, ...data, id: oldDate } : r) } else { const id = editingIncomeId || randomId(); data.createdAt = editingIncomeId ? (incomes.find(r => r.id === editingIncomeId)?.createdAt || new Date().toISOString()) : new Date().toISOString(); await setDoc(doc(db, 'users', currentUser.uid, 'transactions', id), data); if (editingIncomeId) incomes = incomes.map(r => r.id === id ? { id, ...data } : r); else incomes.push({ id, ...data }) } resetIncomeForm(); renderRecords(); setStatus('Income saved.', 'good') } catch (e) { console.error(e); setStatus('Income save failed: ' + e.message, 'error') } finally { btn.disabled = false } });
@@ -922,7 +1159,7 @@ Older money-removal entries without a source are not included in this source bal
                 const id = randomId(), data = { date, amount, direction, note, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
                 await setDoc(doc(db, 'users', currentUser.uid, 'internalTransfers', id), data);
                 internalTransfers.push({ id, ...data }); $('transferForm').reset(); $('transferDate').value = todayKey(); $('transferDirection').value = 'cashToBank';
-                renderRecords(); setStatus('Internal transfer saved. It was not counted as income or money removed.', 'good');
+                renderRecords(); setStatus('Transfer completed successfully.', 'good');
             } catch (e) { console.error(e); setStatus('Transfer save failed: ' + e.message, 'error'); }
             finally { btn.disabled = false; }
         });
@@ -971,8 +1208,8 @@ Older money-removal entries without a source are not included in this source bal
         function refreshDateInputs() { $('incomeDate').value = todayKey(); $('expenseDate').value = todayKey(); $('transferDate').value = todayKey(); if (!editingIncomeId) $('incomeDate').disabled = false; if (!editingExpenseId) $('expenseDate').disabled = false }
         setInterval(() => { if (!editingIncomeId && !editingExpenseId) { refreshDateInputs() } }, 30000);
         refreshDateInputs(); $('expenseSource').value = 'cash'; $('monthInput').value = todayKey().slice(0, 7); updateIncomePreview();
-        getRedirectResult(auth).catch(e => setLoginStatus('Google sign-in error: ' + e.message, 'error'));
-        onAuthStateChanged(auth, async user => { currentUser = user; if (user) { showLoggedIn(user); await loadRecords() } else { showLoggedOut(); setLoginStatus('Sign in with Google to open your private log.') } });
+        getRedirectResult(auth).catch(e => { console.error(e); toast(friendlyError(e), 'error'); });
+        onAuthStateChanged(auth, async user => { currentUser = user; if (user) { showLoggedIn(user); refreshPasswordLinkUI(user); await loadRecords() } else { showLoggedOut(); refreshPasswordLinkUI(null); setLoginStatus('') } });
     </script>
 </body>
 
