@@ -27,3 +27,12 @@ Replace matching files in your existing repository while preserving this folder 
 
 IMPORTANT
 This update does not change Firebase collection names, user IDs, or existing records. Static checks can verify syntax and local structure, but live Firebase authentication and Firestore operations must still be tested in your deployed app.
+
+
+V7 DEVICE FEATURES
+- Optional device PIN lock is separate from Firebase sign-in. PIN hashes use PBKDF2 and a random salt in this browser profile. It is a convenience privacy lock, not a substitute for device security or server-side authorization.
+- Biometric unlock uses the browser's WebAuthn platform authenticator where available. HTTPS is required; support varies by browser/device.
+- Light, dark and system appearance choices are stored on this device.
+- PWA installation uses manifest.json and service-worker.js. On Android Chrome, use Install app / Add to Home screen.
+- Offline support caches the app shell and enables Firestore persistent local cache. Sign in and load records online at least once first. Firestore queues supported writes offline and syncs when connectivity returns. Authentication and first-time account access still require internet.
+- Test carefully on your own device before relying on offline writes. Keep backups.

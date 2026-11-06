@@ -1,0 +1,13 @@
+{
+  "name": "Cashlog — Personal Money Tracker",
+  "short_name": "Cashlog",
+  "description": "Your personal money tracker.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {"src": "assets/cashlog-notebook-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

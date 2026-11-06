@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101827">
+    <meta name="theme-color" content="#050505"><meta name="description" content="Your personal money tracker."><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="assets/cashlog-notebook-mark.png">
     <title>Cash Log</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -47,7 +47,7 @@
         <main id="app" class="hidden">
             <div class="app-header">
                 <div><div class="small muted">Welcome back</div><h2 id="displayName" style="margin:2px 0 0">Your Cash Log</h2></div>
-                <div id="userArea" class="row" style="flex:0 1 auto"><button id="accountPasswordBtn" class="btn secondary hidden" type="button">Set up password</button><button id="signOutBtn" class="btn secondary">Sign out</button></div>
+                <div id="userArea" class="row" style="flex:0 1 auto"><button id="settingsOpenBtn" class="btn secondary" type="button">Settings</button><button id="accountPasswordBtn" class="btn secondary hidden" type="button">Set up password</button><button id="signOutBtn" class="btn secondary">Sign out</button></div>
             </div>
             <section id="accountPasswordPanel" class="card hidden" style="margin:12px 0">
                 <h3 style="margin-top:0">Add a password to this account</h3>
@@ -65,6 +65,10 @@
             <div data-screen-mount="transferScreen"></div>
             <div data-screen-mount="removedScreen"></div>
             <div data-screen-mount="historyScreen"></div>
+            <section id="settingsPanel" class="card settings-panel hidden" aria-labelledby="settingsTitle"><div class="row"><h2 id="settingsTitle">Settings</h2><button id="settingsCloseBtn" class="btn secondary" type="button">Close</button></div>
+              <h3>Appearance</h3><p class="muted small">Choose how Cashlog looks on this device.</p><div class="row"><button id="darkThemeBtn" class="btn secondary" type="button">Dark mode</button><button id="lightThemeBtn" class="btn secondary" type="button">Light mode</button><button id="systemThemeBtn" class="btn secondary" type="button">System</button></div>
+              <hr><h3>App lock</h3><p class="muted small">Set a device-only PIN. This is separate from your Cashlog account password.</p><form id="pinSetupForm"><div class="field"><label for="newPin">New 4-digit PIN</label><input id="newPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><div class="field"><label for="confirmPin">Confirm PIN</label><input id="confirmPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><button class="btn" type="submit">Save PIN</button></form><div class="row" style="margin-top:12px"><button id="enableBiometricBtn" class="btn secondary" type="button">Set up fingerprint</button><button id="removePinBtn" class="btn danger" type="button">Turn off app lock</button></div><p id="securityStatus" class="small muted" aria-live="polite"></p>
+              <hr><h3>Install Cashlog</h3><p class="muted small">Install Cashlog on your phone for an app-like experience.</p><button id="installAppBtn" class="btn secondary" type="button">Install app</button><p class="small muted">Offline mode caches the app shell. Firestore can queue supported changes while offline and sync them when you reconnect, after records have been loaded online once.</p></section>
             <nav class="bottom-nav" aria-label="Main navigation">
                 <button class="nav-btn active" type="button" data-screen="homeScreen"><span class="nav-icon">⌂</span><span>Home</span></button>
                 <button class="nav-btn" type="button" data-screen="incomeScreen"><span class="nav-icon">＋</span><span>Income</span></button>
@@ -76,6 +80,12 @@
         <div class="foot">Cash Log · Your records are private to your signed-in account.</div>
     </div>
     <div id="toast" role="status" aria-live="polite"></div>
+    <section id="appLock" class="app-lock hidden" aria-modal="true" role="dialog" aria-labelledby="lockTitle">
+      <div class="lock-card"><img src="assets/cashlog-notebook-mark.png" alt="Cashlog" class="lock-logo"><h2 id="lockTitle">Cashlog is locked</h2><p class="muted" id="lockMessage">Enter your 4-digit PIN to continue.</p>
+      <form id="unlockForm"><input id="unlockPin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="••••" aria-label="Four digit PIN" required><button class="btn" type="submit">Unlock</button></form>
+      <button id="biometricUnlock" class="btn secondary hidden" type="button">Use fingerprint</button><button id="forgotPin" class="auth-link" type="button">Forgot PIN? Reset with account sign-in</button><p id="lockError" class="small" role="alert"></p></div>
+    </section>
+    <script type="module" src="./js/device-features.js"></script>
 
     <script type="module">
         // Load the screen markup before starting the app module. The app binds
