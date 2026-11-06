@@ -1,4 +1,4 @@
-const CACHE='cashlog-v7-2-shell-v1';
+const CACHE='cashlog-v1-0-shell-v1';
 const SHELL=['./','./index.html','./css/style.css','./js/app.js','./js/firebase.js','./js/device-features.js','./js/screens/home.html','./js/screens/income.html','./js/screens/transfer.html','./js/screens/removed.html','./js/screens/history.html','./manifest.json','./assets/cashlog-notebook-mark.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

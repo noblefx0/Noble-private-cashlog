@@ -520,3 +520,16 @@ body.cashlog-locked{overflow:hidden!important;overscroll-behavior:none!important
 body.cashlog-locked>.wrap,body.cashlog-locked>.foot,body.cashlog-locked>#toast{visibility:hidden!important;pointer-events:none!important}
 .cashlog-version{margin:28px 0 6px!important;padding-top:14px!important;border-top:1px solid var(--line)!important;text-align:center!important;font-size:12px!important;color:var(--muted)!important}
 @media(max-width:380px){.lock-card{padding:18px 16px!important}.lock-card .auth-link{font-size:13px!important}.pin-input{max-width:190px!important}}
+
+
+/* Cashlog public release 1.0: About view and simple unlock interactions */
+.about-brand{text-align:center;padding:18px 0 24px}
+.about-brand img{width:68px;height:68px;object-fit:contain}
+.about-brand h3{margin:8px 0 2px;font-size:22px}
+.about-brand p{margin:0}
+.about-guide p{padding:12px 14px;margin:10px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.about-guide p strong{display:inline-block;margin-bottom:4px}
+.about-heading{position:sticky;top:0;z-index:2;padding:8px 0 14px;background:var(--bg,#050505);border-bottom:1px solid var(--line)}
+.about-heading h2{margin:0}
+#unlockForm{display:flex;flex-direction:column;align-items:center;gap:2px}
+#unlockForm .pin-input{width:min(100%,220px)}

@@ -68,6 +68,7 @@
             <section id="settingsPanel" class="card settings-panel hidden" aria-labelledby="settingsTitle"><div class="row"><h2 id="settingsTitle">Settings</h2><button id="settingsCloseBtn" class="btn secondary" type="button">Close</button></div>
               <h3>Appearance</h3><p class="muted small">Choose how Cashlog looks on this device.</p><div class="row"><button id="darkThemeBtn" class="btn secondary" type="button">Dark mode</button><button id="lightThemeBtn" class="btn secondary" type="button">Light mode</button><button id="systemThemeBtn" class="btn secondary" type="button">System</button></div>
               <hr><h3>App lock</h3><p class="muted small">Set a device-only PIN. This is separate from your Cashlog account password.</p><form id="pinSetupForm"><div class="field"><label for="newPin">New 4-digit PIN</label><input id="newPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><div class="field"><label for="confirmPin">Confirm PIN</label><input id="confirmPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><button class="btn" type="submit">Save PIN</button></form><div class="row" style="margin-top:12px"><button id="enableBiometricBtn" class="btn secondary" type="button">Set up fingerprint</button><button id="removePinBtn" class="btn danger" type="button">Turn off app lock</button></div><p id="securityStatus" class="small muted" aria-live="polite"></p>
+              <hr><h3>About</h3><p class="muted small">Learn what Cashlog does and how to use it.</p><button id="aboutOpenBtn" class="btn secondary" type="button">About Cashlog</button>
               <hr><h3>Install Cashlog</h3><p class="muted small">Install Cashlog on your phone for an app-like experience.</p><button id="installAppBtn" class="btn secondary" type="button">Install app</button><p class="small muted">Offline mode caches the app shell. Firestore can queue supported changes while offline and sync them when you reconnect, after records have been loaded online once.</p><p class="cashlog-version">Cashlog version 1.0</p></section>
             <nav class="bottom-nav" aria-label="Main navigation">
                 <button class="nav-btn active" type="button" data-screen="homeScreen"><span class="nav-icon">⌂</span><span>Home</span></button>
@@ -82,8 +83,22 @@
     <div id="toast" role="status" aria-live="polite"></div>
     <section id="appLock" class="app-lock hidden" aria-modal="true" role="dialog" aria-labelledby="lockTitle">
       <div class="lock-card"><img src="assets/cashlog-notebook-mark.png" alt="Cashlog" class="lock-logo"><h2 id="lockTitle">Cashlog is locked</h2><p class="muted" id="lockMessage">Enter your 4-digit PIN to continue.</p>
-      <form id="unlockForm"><input id="unlockPin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="••••" aria-label="Four digit PIN" required><button class="btn" type="submit">Unlock</button></form>
-      <button id="biometricUnlock" class="btn secondary hidden" type="button">Use fingerprint</button><button id="forgotPin" class="auth-link" type="button">Forgot PIN? Reset with account sign-in</button><p id="lockError" class="small" role="alert"></p></div>
+      <form id="unlockForm"><label class="small muted" for="unlockPin">Enter your 4-digit PIN</label><input id="unlockPin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="••••" aria-label="Four digit PIN" required></form>
+      <button id="biometricUnlock" class="btn secondary hidden" type="button">Try fingerprint again</button><button id="forgotPin" class="auth-link" type="button">Forgot PIN? Reset with account sign-in</button><p id="lockError" class="small" role="alert"></p></div>
+    </section>
+    <section id="aboutPanel" class="card cashlog-settings-view hidden" aria-labelledby="aboutTitle">
+      <div class="row about-heading"><h2 id="aboutTitle">About Cashlog</h2><button id="aboutCloseBtn" class="btn secondary" type="button">Close</button></div>
+      <div class="about-brand"><img src="assets/cashlog-notebook-mark.png" alt="Cashlog logo"><h3>Cashlog</h3><p class="muted">Your personal money tracker.</p></div>
+      <h3>What is Cashlog?</h3>
+      <p>Cashlog helps you keep track of money you receive, move and spend. Record your transactions and review your financial activity in one simple place.</p>
+      <h3>How to use Cashlog</h3>
+      <div class="about-guide"><p><strong>Add Income</strong><br><span class="muted">Record money you receive, whether in cash or by bank transfer.</span></p>
+      <p><strong>Move Money</strong><br><span class="muted">Record money moved between your cash and bank accounts.</span></p>
+      <p><strong>Remove Money</strong><br><span class="muted">Record expenses or other money taken out.</span></p>
+      <p><strong>History</strong><br><span class="muted">Review past transactions and your monthly reports.</span></p></div>
+      <h3>Need help or have a suggestion?</h3>
+      <p>We'd love to hear your feedback. Follow Cashlog on X or contact the developer. The official Cashlog account details will be added here soon.</p>
+      <p class="cashlog-version">Cashlog version 1.0</p>
     </section>
     <script type="module" src="./js/device-features.js"></script>
 

@@ -38,8 +38,14 @@ V7 DEVICE FEATURES
 - Test carefully on your own device before relying on offline writes. Keep backups.
 
 
-VERSION 7.2 UPDATE
-- Settings now opens as a dedicated full-screen view, separate from all transaction screens.
-- PIN lock now fills the phone viewport and centres only the lock card; app content is hidden while locked.
-- Settings displays the app version (7.2).
-- Service-worker cache version bumped so browsers can fetch the updated files.
+PUBLIC RELEASE 1.0 UPDATE
+- Public-facing version label is now Cashlog version 1.0.
+- Added an About Cashlog screen with a short description and quick guide to the main features.
+- Added a placeholder contact note; add the official Cashlog X handle when the account is ready.
+- PIN unlock now checks automatically after the fourth digit; there is no Unlock button.
+- If biometric unlock is enabled, Cashlog automatically attempts fingerprint verification when the lock screen opens where the browser supports it. PIN entry remains available as a fallback.
+- Service-worker cache name updated for this release so browsers can fetch the new app shell.
+
+NOTES
+- Browser/device support and user-activation rules can affect automatic biometric prompts. The PIN remains available if the prompt cannot start or is cancelled.
+- The device PIN is a local app-access feature, not encryption of cloud records. Keep your Cashlog account password secure.
