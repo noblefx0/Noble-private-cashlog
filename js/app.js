@@ -106,26 +106,14 @@ let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTr
             return { cash: cashIn - cashOut - cashToBank + bankToCash, bank: bankIn - bankOut + cashToBank - bankToCash, total: cashIn + bankIn - cashOut - bankOut - unknownOut, cashIn, bankIn };
         }
         function updateToday() {
+            // Home overview is deliberately a daily activity summary only.
+            // It never includes previous-day balances, expenses, or internal transfers.
             const rows = todayIncome();
-            const todayCash = rows.reduce((sum, row) => sum + (Number(row.cash) || 0), 0);
-            const todayBank = rows.reduce((sum, row) => sum + (Number(row.transfer) || 0), 0);
-            const todayTotal = todayCash + todayBank;
-            const throughToday = todayKey();
-            const allRows = allIncomeRows().filter(row => row.date <= throughToday);
-            const allExpenses = expenses.filter(row => row.date <= throughToday);
-            const allTransfers = internalTransfers.filter(row => row.date <= throughToday);
-            const cashIn = allRows.reduce((sum, row) => sum + (Number(row.cash) || 0), 0);
-            const bankIn = allRows.reduce((sum, row) => sum + (Number(row.transfer) || 0), 0);
-            const cashOut = allExpenses.filter(row => row.source === 'cash').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
-            const bankOut = allExpenses.filter(row => row.source === 'transfer').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
-            const cashToBank = allTransfers.filter(row => row.direction === 'cashToBank').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
-            const bankToCash = allTransfers.filter(row => row.direction === 'bankToCash').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
-            const cashBalanceToday = cashIn - cashOut - cashToBank + bankToCash;
-            const bankBalanceToday = bankIn - bankOut + cashToBank - bankToCash;
-            // Balances include all recorded history through today; received today is today's income only.
-            $('homeCashBalance').textContent = money(cashBalanceToday);
-            $('homeTransferBalance').textContent = money(bankBalanceToday);
-            $('homeTotalBalance').textContent = money(todayTotal);
+            const cashReceivedToday = rows.reduce((sum, row) => sum + (Number(row.cash) || 0), 0);
+            const transfersReceivedToday = rows.reduce((sum, row) => sum + (Number(row.transfer) || 0), 0);
+            $('homeCashBalance').textContent = money(cashReceivedToday);
+            $('homeTransferBalance').textContent = money(transfersReceivedToday);
+            $('homeTotalBalance').textContent = money(cashReceivedToday + transfersReceivedToday);
         }
         function updateIncomePreview() { $('incomePreview').textContent = money(safeNum($('cashInput')) + safeNum($('transferInput'))) }
         function isToday(date) { return date === todayKey() }
