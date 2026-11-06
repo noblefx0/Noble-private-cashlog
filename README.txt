@@ -15,3 +15,10 @@ IMPORTANT
 Keep index.html, css/, js/, and assets/ together in the same published folder. Do not rename Firebase collections or replace your Firebase configuration. Existing account records continue using the same Firebase paths as the previous V5 build.
 
 This project has been syntax-checked, but still needs to be tested in your own browser with your Firebase project. Keep a backup of the currently working version until you finish testing.
+
+
+NEXT POLISH UPDATE
+- Updated official CASHLOG logo assets are in assets/.
+- Home screen now focuses on today's total received and current recorded cash/bank balances.
+- Monthly calculations remain in History > Monthly calculation.
+- Display name appears once in the welcome header.

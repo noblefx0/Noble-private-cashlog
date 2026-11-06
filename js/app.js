@@ -36,7 +36,7 @@ let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTr
         function friendlyError(e) { const c=e?.code||''; return ({'auth/email-already-in-use':'An account already exists with this email. Try logging in.','auth/invalid-email':'Enter a valid email address.','auth/weak-password':'Choose a stronger password with at least 6 characters.','auth/user-not-found':'No account found with that email.','auth/wrong-password':'Incorrect email or password.','auth/invalid-credential':'Incorrect email or password.','auth/too-many-requests':'Too many attempts. Please wait a little and try again.','auth/operation-not-allowed':'Email and password sign-in has not been enabled in Firebase yet.','auth/popup-blocked':'Your browser blocked the Google sign-in window. Try again or use email login.','auth/network-request-failed':'Network problem. Check your internet connection.','auth/provider-already-linked':'This account already has email and password sign-in enabled.','auth/credential-already-in-use':'This email/password is already linked to another account. Sign in to that account instead.','auth/email-already-in-use':'This email is already connected to another account. No changes were made to your current account.','auth/requires-recent-login':'For security, sign out and sign in with Google again, then retry.'})[c] || 'Something went wrong. Please try again.'; }
         function setStatus(m, t = '') { if (/failed|could not|error/i.test(m)) toast(/security rules|Firebase|cloud records/i.test(m) ? 'Could not load your records. Please try again later.' : m.replace(/Details:.*/i,'').replace(/Save failed:.*/i,'Please try again.'), 'error'); else if (/saved|deleted|updated/i.test(m)) toast(m.replace(/Internal transfer saved.*/i,'Transfer completed successfully.')); }
         function setLoginStatus(m, t = '') { if (m && /failed|error/i.test(m)) toast(m.replace(/Sign-in failed:.*/i,'Sign-in failed. Please try again.'), 'error'); }
-        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log'; $('userEmail').textContent = u.displayName || 'Signed in'; }
+        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log';  }
         function showLoggedOut() { $('loginCard').classList.remove('hidden'); $('app').classList.add('hidden'); $('userArea').classList.add('hidden') }
         function isEmailPasswordUser(user) { return !!user?.providerData?.some(p => p.providerId === 'password'); }
         function showVerification(user) { $('loginCard').classList.add('hidden'); $('app').classList.add('hidden'); $('verifyCard').classList.remove('hidden'); $('verifyEmail').textContent = user?.email || 'your email address'; }
@@ -107,13 +107,25 @@ let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTr
         }
         function updateToday() {
             const rows = todayIncome();
-            $('todayCashStat').textContent = money(rows.reduce((s, r) => s + (Number(r.cash) || 0), 0));
-            $('todayTransferStat').textContent = money(rows.reduce((s, r) => s + (Number(r.transfer) || 0), 0));
-            $('todayTotalStat').textContent = money(rows.reduce((s, r) => s + r.amount, 0));
-            const month = todayKey().slice(0, 7), balances = monthBalances(month, todayKey());
-            $('homeCashBalance').textContent = money(balances.cash);
-            $('homeTransferBalance').textContent = money(balances.bank);
-            $('homeTotalBalance').textContent = money(balances.total);
+            const todayCash = rows.reduce((sum, row) => sum + (Number(row.cash) || 0), 0);
+            const todayBank = rows.reduce((sum, row) => sum + (Number(row.transfer) || 0), 0);
+            const todayTotal = todayCash + todayBank;
+            const throughToday = todayKey();
+            const allRows = allIncomeRows().filter(row => row.date <= throughToday);
+            const allExpenses = expenses.filter(row => row.date <= throughToday);
+            const allTransfers = internalTransfers.filter(row => row.date <= throughToday);
+            const cashIn = allRows.reduce((sum, row) => sum + (Number(row.cash) || 0), 0);
+            const bankIn = allRows.reduce((sum, row) => sum + (Number(row.transfer) || 0), 0);
+            const cashOut = allExpenses.filter(row => row.source === 'cash').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const bankOut = allExpenses.filter(row => row.source === 'transfer').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const cashToBank = allTransfers.filter(row => row.direction === 'cashToBank').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const bankToCash = allTransfers.filter(row => row.direction === 'bankToCash').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const cashBalanceToday = cashIn - cashOut - cashToBank + bankToCash;
+            const bankBalanceToday = bankIn - bankOut + cashToBank - bankToCash;
+            // Balances include all recorded history through today; received today is today's income only.
+            $('homeCashBalance').textContent = money(cashBalanceToday);
+            $('homeTransferBalance').textContent = money(bankBalanceToday);
+            $('homeTotalBalance').textContent = money(todayTotal);
         }
         function updateIncomePreview() { $('incomePreview').textContent = money(safeNum($('cashInput')) + safeNum($('transferInput'))) }
         function isToday(date) { return date === todayKey() }
