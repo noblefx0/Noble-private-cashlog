@@ -301,11 +301,17 @@ Older money-removal entries without a source are not included in this source bal
         $('welcomeDoneBtn')?.addEventListener('click',()=>{localStorage.setItem('cashlog-welcome-seen-v1','yes');$('welcomeOverlay').classList.add('hidden')});
         function maybeShowWelcome(){if(!localStorage.getItem('cashlog-welcome-seen-v1'))$('welcomeOverlay')?.classList.remove('hidden')}
         let deferredInstallPrompt=null;
-        window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;if(!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('cashlog-install-dismissed'))$('installPrompt').classList.remove('hidden')});
-        $('installPromptButton')?.addEventListener('click',async()=>{if(!deferredInstallPrompt){toast('Use your browser menu and choose Install app or Add to Home screen.');return;}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installPrompt').classList.add('hidden')});
+        const installLink=$('installAppLink');
+        const appIsInstalled=()=>window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+        const updateInstallLink=()=>{if(!installLink)return;const installed=appIsInstalled();installLink.textContent=installed?'App installed':'Install app';installLink.disabled=installed;installLink.setAttribute('aria-label',installed?'Cashlog is installed':'Install Cashlog');};
+        updateInstallLink();
+        window.matchMedia('(display-mode: standalone)').addEventListener?.('change',updateInstallLink);
+        window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;updateInstallLink();if(!appIsInstalled()&&!localStorage.getItem('cashlog-install-dismissed'))$('installPrompt').classList.remove('hidden')});
+        const triggerInstall=async()=>{if(appIsInstalled()){updateInstallLink();return;}if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installPrompt')?.classList.add('hidden');if(choice?.outcome==='accepted')toast('Cashlog installation started.');}else{toast('Open your browser menu and choose Install app or Add to Home screen.');}};
+        $('installAppLink')?.addEventListener('click',triggerInstall);
+        $('installPromptButton')?.addEventListener('click',triggerInstall);
         $('installPromptLater')?.addEventListener('click',()=>{$('installPrompt').classList.add('hidden');localStorage.setItem('cashlog-install-dismissed','yes')});
-        window.addEventListener('appinstalled',()=>{$('installPrompt')?.classList.add('hidden');localStorage.setItem('cashlog-install-dismissed','yes')});
-        $('installAppBtn')?.addEventListener('click',async()=>{if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;}else toast('Open your browser menu and choose Install app or Add to Home screen.')});
+        window.addEventListener('appinstalled',()=>{$('installPrompt')?.classList.add('hidden');localStorage.setItem('cashlog-install-dismissed','yes');updateInstallLink()});
         $('aboutOpenBtn')?.addEventListener('click',()=>{ $('settingsPanel').classList.add('hidden'); $('aboutPanel').classList.remove('hidden'); document.body.classList.add('cashlog-settings-open'); });
         $('aboutCloseBtn')?.addEventListener('click',()=>{ $('aboutPanel').classList.add('hidden'); $('settingsPanel').classList.remove('hidden'); });
         getRedirectResult(auth).catch(e => { console.error(e); toast(friendlyError(e),'error'); });

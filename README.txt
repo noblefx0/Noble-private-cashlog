@@ -61,3 +61,10 @@ PUBLIC RELEASE 1.1 UPDATE
 
 SUPPORTED CURRENCIES IN THIS BUILD
 NGN, ZAR, USD, GBP, GHS, KES, CAD, AUD, INR, EUR, UGX, TZS, RWF and ZMW.
+
+
+PUBLIC RELEASE 1.1.1 PATCH
+- Restored the Settings installation option as a simple underlined text link.
+- The link changes to 'App installed' when Cashlog is running as an installed app.
+- The link uses the browser's native install prompt where available, otherwise it explains the browser-menu installation route.
+- Updated the service-worker cache key to refresh the patched app shell.

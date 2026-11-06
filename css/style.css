@@ -555,3 +555,8 @@ body.cashlog-locked>.wrap,body.cashlog-locked>.foot,body.cashlog-locked>#toast{v
 .install-prompt p{font-size:13px;color:var(--muted);margin:4px 0 12px}
 .install-prompt .row>*{flex:1}
 @media(max-width:380px){.feature-card{padding:20px}.feature-card h2{font-size:22px}.install-prompt .btn{padding:10px;font-size:13px}}
+
+
+/* Lightweight underlined install action in Settings */
+.text-link { background: none; border: 0; padding: 0; margin: 0; color: var(--accent, #2563eb); text-decoration: underline; text-underline-offset: 3px; font: inherit; cursor: pointer; }
+.text-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 2px; }

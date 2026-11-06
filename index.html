@@ -70,7 +70,7 @@
               <hr><h3>App lock</h3><p class="muted small">Set a device-only PIN. This is separate from your Cashlog account password.</p><form id="pinSetupForm"><div class="field"><label for="newPin">New 4-digit PIN</label><input id="newPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><div class="field"><label for="confirmPin">Confirm PIN</label><input id="confirmPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div><button class="btn" type="submit">Save PIN</button></form><div class="row" style="margin-top:12px"><button id="enableBiometricBtn" class="btn secondary" type="button">Set up fingerprint</button><button id="removePinBtn" class="btn danger" type="button">Turn off app lock</button></div><p id="securityStatus" class="small muted" aria-live="polite"></p>
               <hr><h3>Currency</h3><p class="muted small">Choose the currency used to display your records. Changing it does not convert existing amounts.</p><button id="currencyChangeBtn" class="btn secondary" type="button">Change country / currency</button>
               <hr><h3>About</h3><p class="muted small">Learn what Cashlog does and how to use it.</p><button id="aboutOpenBtn" class="btn secondary" type="button">About Cashlog</button>
-              <hr><h3>Install Cashlog</h3><p class="muted small">Use your browser menu to install Cashlog if the install prompt is unavailable.</p><p class="small muted">Offline mode caches the app shell. Firestore can queue supported changes while offline and sync them when you reconnect, after records have been loaded online once.</p><p class="cashlog-version">Cashlog version 1.1</p></section>
+              <hr><h3>Install Cashlog</h3><p class="small"><button id="installAppLink" class="text-link" type="button">Install app</button></p><p class="muted small">If installation is unavailable here, use your browser menu and choose Install app or Add to Home screen.</p><p class="small muted">Offline mode caches the app shell. Firestore can queue supported changes while offline and sync them when you reconnect, after records have been loaded online once.</p><p class="cashlog-version">Cashlog version 1.1.1</p></section>
             <nav class="bottom-nav" aria-label="Main navigation">
                 <button class="nav-btn active" type="button" data-screen="homeScreen"><span class="nav-icon">⌂</span><span>Home</span></button>
                 <button class="nav-btn" type="button" data-screen="incomeScreen"><span class="nav-icon">＋</span><span>Income</span></button>
@@ -108,7 +108,7 @@
       <h3>Need help or have a suggestion?</h3>
       <p>We'd love to hear your feedback. Follow Cashlog or contact the developer:</p>
       <div class="about-contact-links"><a href="https://x.com/cashlogHQ" target="_blank" rel="noopener noreferrer">Official Cashlog on X · @cashlogHQ</a><a href="https://x.com/nobleHQ__" target="_blank" rel="noopener noreferrer">Developer on X · @nobleHQ__</a><a href="https://t.me/nobletg1" target="_blank" rel="noopener noreferrer">Developer on Telegram · @nobletg1</a></div>
-      <p class="cashlog-version">Cashlog version 1.1</p>
+      <p class="cashlog-version">Cashlog version 1.1.1</p>
     </section>
     <script type="module" src="./js/device-features.js"></script>
 
