@@ -4,8 +4,8 @@ import {
   sendPasswordResetEmail, updateProfile, EmailAuthProvider, linkWithCredential,
   signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { collection, doc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTransfers = [], editingIncomeId = null, editingExpenseId = null, monthlyCalculated = false;
+import { collection, doc, getDoc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+let currentUser = null, currentCurrency = 'NGN', currentLocale = 'en-NG', incomes = [], expenses = [], legacyDays = [], internalTransfers = [], editingIncomeId = null, editingExpenseId = null, monthlyCalculated = false;
         const $ = id => document.getElementById(id);
 
         let loadingCount = 0;
@@ -29,19 +29,63 @@ let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTr
 
         const localDateString = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const todayKey = () => localDateString(new Date());
-        const money = n => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(Number(n) || 0);
+        const currencyOptions = [
+  {country:'Nigeria', code:'NGN', locale:'en-NG'}, {country:'South Africa', code:'ZAR', locale:'en-ZA'},
+  {country:'United States', code:'USD', locale:'en-US'}, {country:'United Kingdom', code:'GBP', locale:'en-GB'},
+  {country:'Ghana', code:'GHS', locale:'en-GH'}, {country:'Kenya', code:'KES', locale:'en-KE'},
+  {country:'Canada', code:'CAD', locale:'en-CA'}, {country:'Australia', code:'AUD', locale:'en-AU'},
+  {country:'India', code:'INR', locale:'en-IN'}, {country:'Euro area', code:'EUR', locale:'en-IE'},
+  {country:'Uganda', code:'UGX', locale:'en-UG'}, {country:'Tanzania', code:'TZS', locale:'sw-TZ'},
+  {country:'Rwanda', code:'RWF', locale:'en-RW'}, {country:'Zambia', code:'ZMW', locale:'en-ZM'}
+];
+const money = n => new Intl.NumberFormat(currentLocale, { style: 'currency', currency: currentCurrency, maximumFractionDigits: 0 }).format(Number(n) || 0);
+function applyCurrencyLabels(){
+  const symbol = new Intl.NumberFormat(currentLocale,{style:'currency',currency:currentCurrency,maximumFractionDigits:0}).formatToParts(0).find(p=>p.type==='currency')?.value || currentCurrency;
+  document.querySelectorAll('[data-currency-label]').forEach(el=>{el.textContent=el.dataset.currencyLabel.replace('{currency}',symbol)});
+  document.querySelectorAll('[data-currency-value]').forEach(el=>{if(el.dataset.amount)el.textContent=money(Number(el.dataset.amount))});
+  if($('incomePreview') && $('cashInput') && $('transferInput')) updateIncomePreview();
+}
+async function loadCurrencyPreference(user){
+  currentCurrency='NGN'; currentLocale='en-NG';
+  const prefRef=doc(db,'users',user.uid,'settings','preferences');
+  const snap=await getDoc(prefRef);
+  if(snap.exists() && snap.data().currency){
+    const match=currencyOptions.find(x=>x.code===snap.data().currency);
+    if(match){currentCurrency=match.code;currentLocale=match.locale;}
+  } else {
+    // Accounts created before this release keep the original Nigerian default.
+    const created=Date.parse(user.metadata?.creationTime||'');
+    if(Number.isFinite(created) && created >= Date.parse('2026-11-06T00:00:00Z')) await showCurrencySetup(user,prefRef,true);
+    else await setDoc(prefRef,{currency:'NGN',country:'Nigeria',updatedAt:new Date().toISOString()},{merge:true});
+  }
+  applyCurrencyLabels();
+}
+async function showCurrencySetup(user, prefRef=doc(db,'users',user.uid,'settings','preferences'), required=false){
+  const modal=$('currencySetup'); if(!modal)return;
+  $('currencyCountry').value=currentCurrency; modal.classList.remove('hidden'); modal.dataset.required=required?'yes':'no';
+  $('currencySetupCancel').classList.toggle('hidden',required);
+  return new Promise(resolve=>{
+    const save=async()=>{const option=currencyOptions.find(x=>x.code===$('currencyCountry').value)||currencyOptions[0];$('currencySetupSave').disabled=true;
+      try{await setDoc(prefRef,{currency:option.code,country:option.country,updatedAt:new Date().toISOString()},{merge:true});currentCurrency=option.code;currentLocale=option.locale;applyCurrencyLabels();modal.classList.add('hidden');resolve(true);}
+      catch(e){toast('Could not save currency preference. Please try again.','error');$('currencySetupSave').disabled=false;}
+    };
+    const cancel=()=>{if(required)return;modal.classList.add('hidden');resolve(false)};
+    $('currencySetupSave').onclick=save;$('currencySetupCancel').onclick=cancel;
+  });
+}
+
         const safeNum = el => Math.max(0, Number(el.value) || 0);
         let toastTimer = null;
         function toast(message, type = '') { const el = $('toast'); el.textContent = message; el.className = type; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600); }
         function friendlyError(e) { const c=e?.code||''; return ({'auth/email-already-in-use':'An account already exists with this email. Try logging in.','auth/invalid-email':'Enter a valid email address.','auth/weak-password':'Choose a stronger password with at least 6 characters.','auth/user-not-found':'No account found with that email.','auth/wrong-password':'Incorrect email or password.','auth/invalid-credential':'Incorrect email or password.','auth/too-many-requests':'Too many attempts. Please wait a little and try again.','auth/operation-not-allowed':'Email and password sign-in has not been enabled in Firebase yet.','auth/popup-blocked':'Your browser blocked the Google sign-in window. Try again or use email login.','auth/network-request-failed':'Network problem. Check your internet connection.','auth/provider-already-linked':'This account already has email and password sign-in enabled.','auth/credential-already-in-use':'This email/password is already linked to another account. Sign in to that account instead.','auth/email-already-in-use':'This email is already connected to another account. No changes were made to your current account.','auth/requires-recent-login':'For security, sign out and sign in with Google again, then retry.'})[c] || 'Something went wrong. Please try again.'; }
         function setStatus(m, t = '') { if (/failed|could not|error/i.test(m)) toast(/security rules|Firebase|cloud records/i.test(m) ? 'Could not load your records. Please try again later.' : m.replace(/Details:.*/i,'').replace(/Save failed:.*/i,'Please try again.'), 'error'); else if (/saved|deleted|updated/i.test(m)) toast(m.replace(/Internal transfer saved.*/i,'Transfer completed successfully.')); }
         function setLoginStatus(m, t = '') { if (m && /failed|error/i.test(m)) toast(m.replace(/Sign-in failed:.*/i,'Sign-in failed. Please try again.'), 'error'); }
-        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log';  }
+        function showLoggedIn(u) { $('loginCard').classList.add('hidden'); $('app').classList.remove('hidden'); $('userArea').classList.remove('hidden'); $('displayName').textContent = u.displayName || 'Your Cash Log'; }
         function showLoggedOut() { $('loginCard').classList.remove('hidden'); $('app').classList.add('hidden'); $('userArea').classList.add('hidden') }
         function isEmailPasswordUser(user) { return !!user?.providerData?.some(p => p.providerId === 'password'); }
         function showVerification(user) { $('loginCard').classList.add('hidden'); $('app').classList.add('hidden'); $('verifyCard').classList.remove('hidden'); $('verifyEmail').textContent = user?.email || 'your email address'; }
         $('resendVerificationBtn').addEventListener('click', async () => { try { if (!auth.currentUser) throw new Error('Please sign in again.'); await sendEmailVerification(auth.currentUser); toast('Verification email sent again.'); } catch(e) { toast(friendlyError(e),'error'); } });
-        $('checkVerificationBtn').addEventListener('click', async () => { try { if (!auth.currentUser) { toast('Please sign in again.','error'); return; } await auth.currentUser.reload(); const user = auth.currentUser; if (user.emailVerified) { $('verifyCard').classList.add('hidden'); currentUser=user; showLoggedIn(user); await loadRecords(); toast('Email verified. Welcome to Cashlog.'); } else { toast('Your email is not verified yet. Open the link in your inbox first.','error'); } } catch(e) { toast(friendlyError(e),'error'); } });
+        $('checkVerificationBtn').addEventListener('click', async () => { try { if (!auth.currentUser) { toast('Please sign in again.','error'); return; } await auth.currentUser.reload(); const user = auth.currentUser; if (user.emailVerified) { $('verifyCard').classList.add('hidden'); currentUser=user; showLoggedIn(user); await loadCurrencyPreference(user); await loadRecords(); maybeShowWelcome(); toast('Email verified. Welcome to Cashlog.'); } else { toast('Your email is not verified yet. Open the link in your inbox first.','error'); } } catch(e) { toast(friendlyError(e),'error'); } });
 
         let authMode = 'login';
         function setAuthMode(mode) { authMode=mode; const creating=mode==='signup'; $('authTitle').textContent=creating?'Create your account':'Welcome back'; $('nameField').classList.toggle('hidden',!creating); $('authName').required=creating; $('authPassword').autocomplete=creating?'new-password':'current-password'; $('emailSubmitBtn').textContent=creating?'Create account':'Log in'; $('authModeBtn').textContent=creating?'Already have an account? Log in':'New here? Create an account'; $('forgotPasswordBtn').classList.toggle('hidden',creating); }
@@ -124,7 +168,7 @@ let currentUser = null, incomes = [], expenses = [], legacyDays = [], internalTr
         function addAction(actions, label, cls, fn) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + cls; b.textContent = label; b.addEventListener('click', fn); actions.appendChild(b) }
         function renderRecords() {
             const body = $('recordsBody'); body.replaceChildren(); const month = $('historyMonth').value; const rows = [...allIncomeRows().map(r => ({ ...r, recordType: 'income' })), ...expenses.map(r => ({ ...r, recordType: 'expense', amount: Number(r.amount) || 0 })), ...internalTransfers.map(r => ({ ...r, recordType: 'internalTransfer', amount: Number(r.amount) || 0 }))].filter(r => !month || r.date.startsWith(month)).sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || '').localeCompare(a.createdAt || '')); $('emptyRecords').classList.toggle('hidden', rows.length > 0); $('recordsBody').closest('table').classList.toggle('hidden', rows.length === 0); $('recordCount').textContent = `${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`;
-            for (const r of rows) { const tr = document.createElement('tr'); const expenseType = r.recordType === 'expense' ? (r.source === 'cash' ? 'Money removed (Cash)' : r.source === 'transfer' ? 'Money removed (Bank)' : 'Money removed (older entry; source unknown)') : r.recordType === 'internalTransfer' ? (r.direction === 'cashToBank' ? 'Internal transfer (Cash → Bank)' : 'Internal transfer (Bank → Cash)') : 'Income'; const values = [r.date, r.recordType === 'income' ? 'Income' : expenseType, r.recordType === 'income' ? money(r.cash) : r.recordType === 'internalTransfer' && r.direction === 'bankToCash' ? money(r.amount) : '—', r.recordType === 'income' ? money(r.transfer) : r.recordType === 'internalTransfer' && r.direction === 'cashToBank' ? money(r.amount) : '—', money(r.amount), r.note || '']; for (const v of values) { const td = document.createElement('td'); td.textContent = v; if (typeof v === 'string' && v.startsWith('₦')) td.className = 'amount'; tr.appendChild(td) } const td = document.createElement('td'), actions = document.createElement('div'); actions.className = 'actions'; if (isToday(r.date)) { if (r.recordType === 'income' && r.kind === 'legacy') { addAction(actions, 'Edit', 'secondary', () => editLegacy(r)); addAction(actions, 'Delete', 'danger', () => deleteLegacy(r)) } else if (r.recordType === 'income') { addAction(actions, 'Edit', 'secondary', () => editIncome(r)); addAction(actions, 'Delete', 'danger', () => deleteIncome(r)) } else if (r.recordType === 'expense') { addAction(actions, 'Edit', 'secondary', () => editExpense(r)); addAction(actions, 'Delete', 'danger', () => deleteExpense(r)) } else { addAction(actions, 'Delete', 'danger', () => deleteInternalTransfer(r)) } } else { const locked = document.createElement('span'); locked.className = 'pill'; locked.textContent = 'Locked'; actions.appendChild(locked) } td.appendChild(actions); tr.appendChild(td); body.appendChild(tr) }
+            for (const r of rows) { const tr = document.createElement('tr'); const expenseType = r.recordType === 'expense' ? (r.source === 'cash' ? 'Money removed (Cash)' : r.source === 'transfer' ? 'Money removed (Bank)' : 'Money removed (older entry; source unknown)') : r.recordType === 'internalTransfer' ? (r.direction === 'cashToBank' ? 'Internal transfer (Cash → Bank)' : 'Internal transfer (Bank → Cash)') : 'Income'; const values = [r.date, r.recordType === 'income' ? 'Income' : expenseType, r.recordType === 'income' ? money(r.cash) : r.recordType === 'internalTransfer' && r.direction === 'bankToCash' ? money(r.amount) : '—', r.recordType === 'income' ? money(r.transfer) : r.recordType === 'internalTransfer' && r.direction === 'cashToBank' ? money(r.amount) : '—', money(r.amount), r.note || '']; for (const v of values) { const td = document.createElement('td'); td.textContent = v; if (typeof v === 'string' && /[\p{Sc}]/u.test(v)) td.className = 'amount'; tr.appendChild(td) } const td = document.createElement('td'), actions = document.createElement('div'); actions.className = 'actions'; if (isToday(r.date)) { if (r.recordType === 'income' && r.kind === 'legacy') { addAction(actions, 'Edit', 'secondary', () => editLegacy(r)); addAction(actions, 'Delete', 'danger', () => deleteLegacy(r)) } else if (r.recordType === 'income') { addAction(actions, 'Edit', 'secondary', () => editIncome(r)); addAction(actions, 'Delete', 'danger', () => deleteIncome(r)) } else if (r.recordType === 'expense') { addAction(actions, 'Edit', 'secondary', () => editExpense(r)); addAction(actions, 'Delete', 'danger', () => deleteExpense(r)) } else { addAction(actions, 'Delete', 'danger', () => deleteInternalTransfer(r)) } } else { const locked = document.createElement('span'); locked.className = 'pill'; locked.textContent = 'Locked'; actions.appendChild(locked) } td.appendChild(actions); tr.appendChild(td); body.appendChild(tr) }
             updateToday()
         }
         function editIncome(r) { if (!isToday(r.date)) return alert('Only today’s entries can be edited.'); editingIncomeId = r.id; $('incomeDate').value = r.date; $('incomeDate').disabled = true; $('cashInput').value = r.cash; $('transferInput').value = r.transfer; $('incomeNote').value = r.note || ''; $('incomeFormTitle').textContent = 'Edit today’s income'; $('saveIncomeBtn').textContent = 'Update income'; $('cancelIncomeEditBtn').classList.remove('hidden'); updateIncomePreview(); window.scrollTo({ top: 0, behavior: 'smooth' }) }
@@ -253,5 +297,16 @@ Older money-removal entries without a source are not included in this source bal
         function refreshDateInputs() { $('incomeDate').value = todayKey(); $('expenseDate').value = todayKey(); $('transferDate').value = todayKey(); if (!editingIncomeId) $('incomeDate').disabled = false; if (!editingExpenseId) $('expenseDate').disabled = false }
         setInterval(() => { if (!editingIncomeId && !editingExpenseId) { refreshDateInputs() } }, 30000);
         refreshDateInputs(); $('expenseSource').value = 'cash'; $('monthInput').value = todayKey().slice(0, 7); updateIncomePreview();
+        $('currencyChangeBtn')?.addEventListener('click',()=>showCurrencySetup(currentUser,doc(db,'users',currentUser.uid,'settings','preferences'),false));
+        $('welcomeDoneBtn')?.addEventListener('click',()=>{localStorage.setItem('cashlog-welcome-seen-v1','yes');$('welcomeOverlay').classList.add('hidden')});
+        function maybeShowWelcome(){if(!localStorage.getItem('cashlog-welcome-seen-v1'))$('welcomeOverlay')?.classList.remove('hidden')}
+        let deferredInstallPrompt=null;
+        window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;if(!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('cashlog-install-dismissed'))$('installPrompt').classList.remove('hidden')});
+        $('installPromptButton')?.addEventListener('click',async()=>{if(!deferredInstallPrompt){toast('Use your browser menu and choose Install app or Add to Home screen.');return;}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installPrompt').classList.add('hidden')});
+        $('installPromptLater')?.addEventListener('click',()=>{$('installPrompt').classList.add('hidden');localStorage.setItem('cashlog-install-dismissed','yes')});
+        window.addEventListener('appinstalled',()=>{$('installPrompt')?.classList.add('hidden');localStorage.setItem('cashlog-install-dismissed','yes')});
+        $('installAppBtn')?.addEventListener('click',async()=>{if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;}else toast('Open your browser menu and choose Install app or Add to Home screen.')});
+        $('aboutOpenBtn')?.addEventListener('click',()=>{ $('settingsPanel').classList.add('hidden'); $('aboutPanel').classList.remove('hidden'); document.body.classList.add('cashlog-settings-open'); });
+        $('aboutCloseBtn')?.addEventListener('click',()=>{ $('aboutPanel').classList.add('hidden'); $('settingsPanel').classList.remove('hidden'); });
         getRedirectResult(auth).catch(e => { console.error(e); toast(friendlyError(e),'error'); });
-        onAuthStateChanged(auth, async user => { currentUser = user; if (user && isEmailPasswordUser(user) && !user.emailVerified) { showVerification(user); refreshPasswordLinkUI(user); hideSplash(); return; } if (user) { $('verifyCard').classList.add('hidden'); showLoggedIn(user); refreshPasswordLinkUI(user); await loadRecords() } else { $('verifyCard').classList.add('hidden'); showLoggedOut(); refreshPasswordLinkUI(null); setLoginStatus('') } hideSplash(); });
+        onAuthStateChanged(auth, async user => { currentUser = user; if (user && isEmailPasswordUser(user) && !user.emailVerified) { showVerification(user); refreshPasswordLinkUI(user); hideSplash(); return; } if (user) { $('verifyCard').classList.add('hidden'); showLoggedIn(user); refreshPasswordLinkUI(user); await loadCurrencyPreference(user); await loadRecords(); maybeShowWelcome() } else { $('verifyCard').classList.add('hidden'); showLoggedOut(); refreshPasswordLinkUI(null); setLoginStatus('') } hideSplash(); });

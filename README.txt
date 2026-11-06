@@ -49,3 +49,15 @@ PUBLIC RELEASE 1.0 UPDATE
 NOTES
 - Browser/device support and user-activation rules can affect automatic biometric prompts. The PIN remains available if the prompt cannot start or is cancelled.
 - The device PIN is a local app-access feature, not encryption of cloud records. Keep your Cashlog account password secure.
+
+
+PUBLIC RELEASE 1.1 UPDATE
+- Added a first-time welcome guide (shown once per browser profile).
+- Updated About Cashlog with official Cashlog X and developer contact links.
+- Added a browser install prompt when installation is available; users can dismiss it.
+- Added country/currency preferences stored under users/{uid}/settings/preferences. Existing accounts retain NGN by default; accounts created from this release are asked to choose a currency.
+- Currency preference changes display formatting only. It does not perform exchange-rate conversion or modify transaction amounts.
+- Existing transaction, expense, daily record and internal transfer collection paths are unchanged.
+
+SUPPORTED CURRENCIES IN THIS BUILD
+NGN, ZAR, USD, GBP, GHS, KES, CAD, AUD, INR, EUR, UGX, TZS, RWF and ZMW.
