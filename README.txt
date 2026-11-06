@@ -36,3 +36,10 @@ V7 DEVICE FEATURES
 - PWA installation uses manifest.json and service-worker.js. On Android Chrome, use Install app / Add to Home screen.
 - Offline support caches the app shell and enables Firestore persistent local cache. Sign in and load records online at least once first. Firestore queues supported writes offline and syncs when connectivity returns. Authentication and first-time account access still require internet.
 - Test carefully on your own device before relying on offline writes. Keep backups.
+
+
+VERSION 7.2 UPDATE
+- Settings now opens as a dedicated full-screen view, separate from all transaction screens.
+- PIN lock now fills the phone viewport and centres only the lock card; app content is hidden while locked.
+- Settings displays the app version (7.2).
+- Service-worker cache version bumped so browsers can fetch the updated files.

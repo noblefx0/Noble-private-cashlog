@@ -499,3 +499,24 @@ body.cashlog-locked > .wrap,
 body.cashlog-locked > #toast{pointer-events:none}
 body.light .settings-panel{background:var(--bg,#f3f4f6)}
 body.light .settings-panel > .row:first-child{background:var(--bg,#f3f4f6)}
+
+
+/* CASHLOG V7.2 — dedicated Settings route and true full-screen PIN lock */
+.cashlog-settings-view{position:fixed!important;inset:0!important;z-index:2000!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-height:100dvh!important;box-sizing:border-box!important;margin:0!important;padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom))!important;overflow-y:auto!important;overscroll-behavior:contain!important;border:0!important;border-radius:0!important;background:var(--bg,#050505)!important;box-shadow:none!important;display:block!important}
+.cashlog-settings-view.hidden{display:none!important}
+body.cashlog-settings-open{overflow:hidden!important}
+body.cashlog-settings-open>.wrap{visibility:hidden!important;pointer-events:none!important}
+body.cashlog-settings-open>.foot{display:none!important}
+body.cashlog-settings-open .cashlog-settings-view{visibility:visible!important;pointer-events:auto!important}
+.app-lock{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;box-sizing:border-box!important;z-index:2147483000!important;display:grid!important;place-items:center!important;overflow:hidden!important;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))!important;background:var(--bg,#050505)!important}
+.app-lock.hidden{display:none!important}
+.lock-card{width:min(88vw,360px)!important;max-width:360px!important;max-height:calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;overflow-y:auto!important;box-sizing:border-box!important;margin:auto!important;padding:clamp(18px,5vw,28px)!important;border-radius:22px!important;text-align:center!important}
+.lock-logo{display:block!important;width:clamp(54px,16vw,72px)!important;height:clamp(54px,16vw,72px)!important;margin:0 auto 12px!important}
+.lock-card h2{font-size:clamp(20px,5.5vw,25px)!important;margin:8px 0!important}
+.lock-card p{font-size:14px!important;line-height:1.45!important}
+.pin-input{display:block!important;width:min(100%,220px)!important;max-width:220px!important;min-height:54px!important;font-size:22px!important;letter-spacing:.45em!important;margin:16px auto!important;box-sizing:border-box!important}
+.lock-card button{min-height:46px!important;font-size:15px!important}
+body.cashlog-locked{overflow:hidden!important;overscroll-behavior:none!important}
+body.cashlog-locked>.wrap,body.cashlog-locked>.foot,body.cashlog-locked>#toast{visibility:hidden!important;pointer-events:none!important}
+.cashlog-version{margin:28px 0 6px!important;padding-top:14px!important;border-top:1px solid var(--line)!important;text-align:center!important;font-size:12px!important;color:var(--muted)!important}
+@media(max-width:380px){.lock-card{padding:18px 16px!important}.lock-card .auth-link{font-size:13px!important}.pin-input{max-width:190px!important}}

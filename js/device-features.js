@@ -10,8 +10,12 @@ function showLock(){if(!activeUid||!localStorage.getItem(key()))return;locked=tr
 function hideLock(){locked=false;document.body.classList.remove('cashlog-locked');$('appLock').classList.add('hidden')}
 function applyTheme(mode){let chosen=mode;if(mode==='system')chosen=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.body.classList.toggle('light',chosen==='light');document.querySelector('meta[name="theme-color"]')?.setAttribute('content',chosen==='light'?'#f3f4f6':'#050505');localStorage.setItem('cashlog.theme',mode)}
 applyTheme(localStorage.getItem('cashlog.theme')||'dark');
-function openSettings(){const panel=$('settingsPanel');if(!panel)return;panel.classList.remove('hidden');document.body.classList.add('cashlog-settings-open');panel.scrollTop=0;$('settingsCloseBtn')?.focus()}
-function closeSettings(){const panel=$('settingsPanel');if(!panel)return;panel.classList.add('hidden');document.body.classList.remove('cashlog-settings-open');$('settingsOpenBtn')?.focus()}
+let previousScreenId='homeScreen';
+// Detach Settings from the app's content flow so it is a true independent view.
+const settingsPanel=$('settingsPanel');
+if(settingsPanel){settingsPanel.classList.add('cashlog-settings-view');document.body.appendChild(settingsPanel)}
+function openSettings(){const panel=$('settingsPanel');if(!panel)return;previousScreenId=document.querySelector('.screen.active')?.id||'homeScreen';document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));$('mainStatus')?.classList.add('hidden');panel.classList.remove('hidden');document.body.classList.add('cashlog-settings-open');panel.scrollTop=0;window.scrollTo(0,0);$('settingsCloseBtn')?.focus()}
+function closeSettings(){const panel=$('settingsPanel');if(!panel)return;panel.classList.add('hidden');document.body.classList.remove('cashlog-settings-open');document.getElementById(previousScreenId)?.classList.add('active');$('mainStatus')?.classList.remove('hidden');window.scrollTo(0,0);$('settingsOpenBtn')?.focus()}
 $('settingsOpenBtn')?.addEventListener('click',openSettings);$('settingsCloseBtn')?.addEventListener('click',closeSettings);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('settingsPanel')?.classList.contains('hidden'))closeSettings()});
 $('darkThemeBtn')?.addEventListener('click',()=>applyTheme('dark'));$('lightThemeBtn')?.addEventListener('click',()=>applyTheme('light'));$('systemThemeBtn')?.addEventListener('click',()=>applyTheme('system'));
